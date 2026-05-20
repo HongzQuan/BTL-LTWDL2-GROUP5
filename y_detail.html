@@ -1,0 +1,613 @@
+<style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0
+    }
+
+    .app {
+        font-size: 13px;
+        padding: 8px 0
+    }
+
+    .tabs {
+        display: flex;
+        gap: 6px;
+        margin-bottom: 16px;
+        flex-wrap: wrap
+    }
+
+    .tab-btn {
+        padding: 6px 14px;
+        border: 0.5px solid var(--color-border-secondary);
+        border-radius: 20px;
+        background: transparent;
+        color: var(--color-text-secondary);
+        cursor: pointer;
+        font-size: 12px;
+        transition: all .15s
+    }
+
+    .tab-btn.active {
+        background: var(--color-background-info);
+        color: var(--color-text-info);
+        border-color: var(--color-border-info)
+    }
+
+    .page-list {
+        display: grid;
+        grid-template-columns: 200px 1fr;
+        gap: 12px;
+        min-height: 480px
+    }
+
+    .sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 4px
+    }
+
+    .page-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 10px;
+        border: none;
+        background: transparent;
+        border-radius: var(--border-radius-md);
+        cursor: pointer;
+        text-align: left;
+        font-size: 12px;
+        color: var(--color-text-secondary);
+        transition: all .15s;
+        width: 100%
+    }
+
+    .page-btn:hover {
+        background: var(--color-background-secondary)
+    }
+
+    .page-btn.active {
+        background: var(--color-background-secondary);
+        color: var(--color-text-primary);
+        font-weight: 500
+    }
+
+    .page-btn .pi {
+        font-size: 15px;
+        opacity: .7;
+        flex-shrink: 0
+    }
+
+    .content-area {
+        border: 0.5px solid var(--color-border-tertiary);
+        border-radius: var(--border-radius-lg);
+        padding: 16px;
+        overflow: auto
+    }
+
+    .page-title {
+        font-size: 15px;
+        font-weight: 500;
+        color: var(--color-text-primary);
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 8px
+    }
+
+    .page-route {
+        font-size: 11px;
+        color: var(--color-text-tertiary);
+        font-family: var(--font-mono);
+        margin-bottom: 12px
+    }
+
+    .section {
+        margin-bottom: 14px
+    }
+
+    .section-label {
+        font-size: 11px;
+        font-weight: 500;
+        color: var(--color-text-secondary);
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        margin-bottom: 6px
+    }
+
+    .item-list {
+        display: flex;
+        flex-direction: column;
+        gap: 4px
+    }
+
+    .item {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        padding: 7px 10px;
+        background: var(--color-background-secondary);
+        border-radius: var(--border-radius-md);
+        font-size: 12px;
+        color: var(--color-text-primary);
+        line-height: 1.5
+    }
+
+    .item .dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        margin-top: 5px
+    }
+
+    .dot-ui {
+        background: #378ADD
+    }
+
+    .dot-logic {
+        background: #1D9E75
+    }
+
+    .dot-valid {
+        background: #D85A30
+    }
+
+    .dot-guard {
+        background: #D4537E
+    }
+
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 2px 7px;
+        border-radius: 4px;
+        font-size: 10px;
+        font-weight: 500;
+        margin-right: 4px;
+        white-space: nowrap
+    }
+
+    .b-get {
+        background: #E1F5EE;
+        color: #085041
+    }
+
+    .b-post {
+        background: #FAEEDA;
+        color: #633806
+    }
+
+    .b-put {
+        background: #E6F1FB;
+        color: #0C447C
+    }
+
+    .b-del {
+        background: #FCEBEB;
+        color: #791F1F
+    }
+
+    .b-auth {
+        background: #EEEDFE;
+        color: #3C3489
+    }
+
+    .b-admin {
+        background: #FAECE7;
+        color: #712B13
+    }
+
+    .method-row {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 5px;
+        flex-wrap: wrap
+    }
+
+    .divider {
+        height: 0.5px;
+        background: var(--color-border-tertiary);
+        margin: 10px 0
+    }
+
+    .empty {
+        color: var(--color-text-tertiary);
+        font-size: 12px;
+        padding: 20px;
+        text-align: center
+    }
+</style>
+
+<div class="app">
+    <div class="tabs" id="tabs">
+        <button class="tab-btn active" onclick="switchTab('frontend')"><i class="ti ti-device-desktop"
+                style="font-size:13px"></i> Frontend</button>
+        <button class="tab-btn" onclick="switchTab('admin')"><i class="ti ti-settings" style="font-size:13px"></i>
+            Admin</button>
+        <button class="tab-btn" onclick="switchTab('auth')"><i class="ti ti-lock" style="font-size:13px"></i>
+            Auth</button>
+    </div>
+
+    <div class="page-list">
+        <div class="sidebar" id="sidebar"></div>
+        <div class="content-area" id="content">
+            <div class="empty">Chọn trang để xem chi tiết</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const pages = {
+        frontend: [
+            {
+                id: 'home', icon: 'ti-home', label: 'Trang chủ',
+                title: 'Trang chủ', route: 'GET /',
+                ui: [
+                    'Navbar: logo, menu, nút đăng nhập/đăng ký, tên user nếu đã login',
+                    'Hero banner: ô tìm kiếm nhanh (nhà hàng, thành phố)',
+                    'Section chọn thành phố: icon card (HN, HCM, Đà Nẵng, Hội An...)',
+                    'Section danh mục: pill filter theo loại ẩm thực (Hải sản, Lẩu, Buffet...)',
+                    'Grid nhà hàng nổi bật: top 8 theo rating hoặc booking count',
+                    'Section khu phố ẩm thực: 4 card với ảnh + tên khu + số nhà hàng',
+                    'Grid nhà hàng mới: 6 card order by created_at DESC',
+                    'Footer: thông tin liên hệ, link nhanh',
+                ],
+                logic: [
+                    'Query top 8 restaurants: ORDER BY avg(reviews.rating) DESC hoặc COUNT(bookings)',
+                    'Query theo city: truyền ?city=hanoi vào RestaurantController@index',
+                    'Query theo category_id: truyền ?category=1 để lọc danh mục',
+                    'Ô tìm kiếm redirect sang /restaurants/search?q=...',
+                    'Nếu chưa login: nút "Đặt bàn" sẽ redirect về /login trước',
+                ],
+                guard: []
+            },
+            {
+                id: 'restaurant-list', icon: 'ti-building-store', label: 'Danh sách nhà hàng',
+                title: 'Danh sách nhà hàng', route: 'GET /restaurants',
+                ui: [
+                    'Thanh filter: thành phố (select), danh mục (checkbox pills), khoảng giá (range)',
+                    'Ô tìm kiếm: tìm theo tên nhà hàng',
+                    'Sort: Nổi bật / Mới nhất / Giá tăng / Giá giảm',
+                    'Grid 3 cột: card nhà hàng (ảnh, tên, địa chỉ, rating sao, giờ mở cửa, badge danh mục)',
+                    'Pagination: 12 nhà hàng/trang',
+                    'Hiển thị số kết quả: "Tìm thấy 24 nhà hàng"',
+                ],
+                logic: [
+                    '$query = Restaurant::with(["category","reviews"])->where("status",1)',
+                    'Lọc city: if($request->city) $query->where("city",$request->city)',
+                    'Lọc category: if($request->category) $query->where("category_id",...)',
+                    'Lọc giá: $query->whereBetween("price_range",[$min,$max])',
+                    'Tìm kiếm: $query->where("name","like","%{$q}%")->orWhere("address","like",...)',
+                    'Sort: $query->orderBy($sort, $dir)',
+                    'Paginate: $query->paginate(12) — giữ filter khi chuyển trang qua ->withQueryString()',
+                    'Rating trung bình: tính bằng withAvg("reviews","rating")',
+                ],
+                guard: []
+            },
+            {
+                id: 'restaurant-show', icon: 'ti-info-circle', label: 'Chi tiết nhà hàng',
+                title: 'Chi tiết nhà hàng', route: 'GET /restaurants/{id}',
+                ui: [
+                    'Ảnh banner lớn + gallery ảnh phụ',
+                    'Tên, địa chỉ, SĐT, giờ mở/đóng cửa, khoảng giá',
+                    'Rating tổng + thanh sao phân phối (5★ bao nhiêu %, 4★...)',
+                    'Tab: Thực đơn | Đánh giá | Thông tin',
+                    'Tab Thực đơn: nhóm theo loại (Khai vị, Món chính, Tráng miệng, Đồ uống)',
+                    'Sidebar: widget "Đặt bàn" (chọn ngày, giờ, số khách) — nút Tìm bàn trống',
+                    'Section đánh giá: list reviews (avatar, tên, sao, nội dung, ngày)',
+                    'Form viết đánh giá: chỉ hiện nếu đã login và đã từng đặt bàn ở đây',
+                    'Nhà hàng tương tự: 4 card cùng danh mục hoặc cùng thành phố',
+                ],
+                logic: [
+                    'Load: Restaurant::with(["category","tables","menuItems","reviews.user"])->findOrFail($id)',
+                    'Đếm rating trung bình + phân phối: group reviews by rating, đếm từng mức',
+                    'Kiểm tra bàn trống khi user chọn ngày-giờ-số khách: AJAX gọi /api/tables/available',
+                    'Logic available: bàn chưa có booking nào cùng ngày+giờ có status confirmed/pending',
+                    'Chỉ cho viết review nếu: đã đăng nhập + có booking cũ status=completed tại nhà hàng này',
+                    'Nhà hàng tương tự: lấy 4 nhà hàng cùng category_id, loại trừ nhà hàng hiện tại',
+                ],
+                guard: []
+            },
+            {
+                id: 'booking-create', icon: 'ti-calendar-plus', label: 'Đặt bàn',
+                title: 'Tạo đặt bàn', route: 'GET /bookings/create?restaurant_id=X',
+                ui: [
+                    'Tiêu đề nhà hàng + địa chỉ đang đặt',
+                    'Bước 1 — Chọn thông tin: ngày (date picker), giờ (select giờ hoạt động), số khách (number)',
+                    'Bước 2 — Chọn bàn: hiện danh sách bàn còn trống phù hợp số khách, mỗi bàn có tên + sức chứa',
+                    'Bước 3 — Xác nhận: tóm tắt thông tin, ô ghi chú (dị ứng, yêu cầu đặc biệt)',
+                    'Nút Xác nhận đặt bàn — submit form',
+                    'Thông báo thành công: "Đặt bàn thành công! Mã đơn #123"',
+                ],
+                logic: [
+                    'Middleware auth: chưa login redirect về /login',
+                    'GET: hiện form với restaurant_id từ query string',
+                    'AJAX kiểm tra bàn trống real-time khi user thay đổi ngày/giờ/số khách',
+                    'POST StoreBookingRequest validation: booking_date >= today, booking_time in open range, guests >= 1',
+                    'BookingService::create(): tạo booking, set status = pending',
+                    'Sau khi tạo: redirect /bookings/{id} với flash message "Đặt bàn thành công"',
+                ],
+                guard: ['auth']
+            },
+            {
+                id: 'booking-index', icon: 'ti-list', label: 'Lịch sử đặt bàn',
+                title: 'Lịch sử đặt bàn (user)', route: 'GET /bookings',
+                ui: [
+                    'Filter trạng thái: Tất cả | Chờ xác nhận | Đã xác nhận | Đã hủy | Hoàn thành',
+                    'List booking: mỗi item có mã đơn, tên nhà hàng, ngày giờ, số khách, trạng thái badge',
+                    'Badge màu: pending=vàng, confirmed=xanh, cancelled=đỏ, completed=xám',
+                    'Nút Xem chi tiết — link sang /bookings/{id}',
+                    'Nút Hủy đặt bàn — chỉ hiện khi status=pending, mở confirm dialog',
+                    'Empty state nếu chưa có đơn nào',
+                ],
+                logic: [
+                    'Middleware auth',
+                    '$bookings = auth()->user()->bookings()->with("restaurant","table")->latest()->paginate(10)',
+                    'Filter status: if($request->status) ->where("status",$request->status)',
+                    'Chỉ trả về đơn của user đang đăng nhập — không được xem đơn người khác',
+                ],
+                guard: ['auth']
+            },
+            {
+                id: 'booking-show', icon: 'ti-receipt', label: 'Chi tiết đơn đặt bàn',
+                title: 'Chi tiết đơn đặt bàn', route: 'GET /bookings/{id}',
+                ui: [
+                    'Mã đơn, ngày tạo',
+                    'Thông tin nhà hàng: tên, địa chỉ, SĐT',
+                    'Thông tin đặt: ngày, giờ, số khách, tên bàn, ghi chú',
+                    'Trạng thái đơn + timeline (Đã tạo → Chờ xác nhận → Đã xác nhận)',
+                    'Nút Hủy đặt bàn: chỉ hiện khi status=pending',
+                    'Nút Viết đánh giá: chỉ hiện khi status=completed và chưa review',
+                ],
+                logic: [
+                    'Middleware auth + CheckBookingOwner: booking->user_id === auth()->id() — nếu không redirect 403',
+                    '$booking = Booking::with(["restaurant","table","user"])->findOrFail($id)',
+                    'Nút hủy: PUT /bookings/{id}/cancel — set status=cancelled, chỉ cho hủy nếu status=pending',
+                ],
+                guard: ['auth', 'owner']
+            },
+        ],
+        admin: [
+            {
+                id: 'admin-dashboard', icon: 'ti-dashboard', label: 'Dashboard',
+                title: 'Admin Dashboard', route: 'GET /admin',
+                ui: [
+                    'Metric cards hàng đầu: Tổng nhà hàng | Tổng đơn hôm nay | Đơn chờ xác nhận | Doanh thu tháng',
+                    'Biểu đồ Line: đơn đặt 7 ngày gần nhất',
+                    'Biểu đồ Donut/Pie: tỉ lệ trạng thái đơn (pending/confirmed/cancelled/completed)',
+                    'Bảng đơn mới nhất: top 10 booking mới, có nút xác nhận nhanh',
+                    'Top 5 nhà hàng được đặt nhiều nhất (tuần này)',
+                ],
+                logic: [
+                    'Tổng đơn hôm nay: Booking::whereDate("created_at",today())->count()',
+                    'Đơn chờ: Booking::where("status","pending")->count()',
+                    'Doanh thu: không có trường price trong booking, tính bằng số đơn × giá trung bình (demo)',
+                    'Biểu đồ 7 ngày: GROUP BY DATE(created_at) COUNT(*) — trả về JSON cho Chart.js',
+                    'Top nhà hàng: JOIN bookings GROUP BY restaurant_id ORDER BY COUNT DESC LIMIT 5',
+                ],
+                guard: ['auth', 'admin']
+            },
+            {
+                id: 'admin-restaurants', icon: 'ti-building-store', label: 'Quản lý nhà hàng',
+                title: 'Quản lý nhà hàng', route: 'GET /admin/restaurants',
+                ui: [
+                    'Nút "+ Thêm nhà hàng" góc trên phải',
+                    'Bộ lọc: theo thành phố, danh mục, trạng thái (active/inactive)',
+                    'Bảng danh sách: ảnh thumbnail, tên, thành phố, danh mục, giờ mở cửa, trạng thái, số bàn, action',
+                    'Action mỗi hàng: nút Sửa (edit icon), nút Xóa (trash icon + confirm dialog), toggle trạng thái',
+                    'Phân trang 15 nhà hàng/trang',
+                    'Form thêm/sửa (trang riêng): tên, địa chỉ, thành phố, SĐT, danh mục, mô tả (textarea), ảnh (file upload preview), giờ mở/đóng, khoảng giá, trạng thái',
+                ],
+                logic: [
+                    'index(): Restaurant::with("category")->paginate(15) + filter',
+                    'store(): validate StoreRestaurantRequest — upload ảnh bằng ImageUploadService → lưu path vào DB',
+                    'update(): tìm restaurant, cập nhật fields, nếu có ảnh mới thì xóa ảnh cũ, lưu ảnh mới',
+                    'destroy(): kiểm tra còn booking pending không → nếu có, báo lỗi không xóa được',
+                    'Xóa mềm (soft delete) hoặc set status=0 thay vì xóa hẳn — an toàn hơn',
+                    'Upload ảnh: $request->file("image")->store("restaurants","public") → lưu path',
+                ],
+                guard: ['auth', 'admin']
+            },
+            {
+                id: 'admin-tables', icon: 'ti-armchair', label: 'Quản lý bàn ăn',
+                title: 'Quản lý bàn ăn', route: 'GET /admin/tables',
+                ui: [
+                    'Filter theo nhà hàng (select dropdown)',
+                    'Bảng: tên bàn, sức chứa, trạng thái (available/occupied/maintenance), nhà hàng, ghi chú',
+                    'Badge trạng thái màu: available=xanh, occupied=vàng, maintenance=đỏ',
+                    'Action: Sửa, Xóa, đổi trạng thái nhanh',
+                    'Form thêm bàn: chọn nhà hàng, tên bàn, sức chứa, trạng thái, ghi chú',
+                ],
+                logic: [
+                    'Validate: capacity >= 1 và <= 50',
+                    'Không cho xóa bàn nếu có booking pending/confirmed đang dùng bàn đó',
+                    'Khi đổi trạng thái sang maintenance: tự động hủy các booking pending của bàn đó',
+                ],
+                guard: ['auth', 'admin']
+            },
+            {
+                id: 'admin-menus', icon: 'ti-tools-kitchen-2', label: 'Quản lý thực đơn',
+                title: 'Quản lý thực đơn', route: 'GET /admin/menu-items',
+                ui: [
+                    'Filter theo nhà hàng + loại món (Khai vị, Món chính, Tráng miệng, Đồ uống)',
+                    'Bảng: ảnh nhỏ, tên món, nhà hàng, loại, giá, trạng thái còn phục vụ không',
+                    'Toggle "còn phục vụ" trực tiếp trên bảng (AJAX)',
+                    'Form thêm/sửa: chọn nhà hàng, tên, mô tả, giá, loại, ảnh, toggle available',
+                ],
+                logic: [
+                    'Giá validate: numeric, min:0',
+                    'Toggle available: AJAX PUT /admin/menu-items/{id}/toggle — trả JSON {status, is_available}',
+                    'Upload ảnh tương tự nhà hàng',
+                ],
+                guard: ['auth', 'admin']
+            },
+            {
+                id: 'admin-bookings', icon: 'ti-calendar', label: 'Quản lý đặt bàn',
+                title: 'Quản lý đặt bàn', route: 'GET /admin/bookings',
+                ui: [
+                    'Filter: nhà hàng, ngày đặt (date range), trạng thái, tìm theo tên/SĐT khách',
+                    'Bảng: mã đơn, tên khách, SĐT, nhà hàng, bàn, ngày giờ, số khách, trạng thái, ngày tạo',
+                    'Action: Xác nhận (→ confirmed), Hủy (→ cancelled), Hoàn thành (→ completed)',
+                    'Confirm dialog trước khi đổi trạng thái',
+                    'Export CSV (điểm cộng): xuất danh sách đơn theo filter hiện tại',
+                ],
+                logic: [
+                    'Chỉ admin mới thay đổi status đơn',
+                    'Xác nhận: status pending → confirmed (kiểm tra bàn chưa bị book bởi ai khác)',
+                    'Hủy: status pending/confirmed → cancelled',
+                    'Hoàn thành: status confirmed → completed (chỉ sau ngày đặt)',
+                    'Gửi email thông báo sau khi đổi status (điểm cộng — dùng Laravel Mail + Queue)',
+                ],
+                guard: ['auth', 'admin']
+            },
+            {
+                id: 'admin-users', icon: 'ti-users', label: 'Quản lý khách hàng',
+                title: 'Quản lý khách hàng', route: 'GET /admin/users',
+                ui: [
+                    'Tìm kiếm theo tên, email, SĐT',
+                    'Bảng: avatar, tên, email, SĐT, ngày đăng ký, số đơn đã đặt, trạng thái tài khoản',
+                    'Action: Xem chi tiết (popup lịch sử đặt bàn), Khóa/Mở khóa tài khoản',
+                    'Badge: active=xanh, banned=đỏ',
+                    'Không có nút xóa — chỉ khóa tài khoản (an toàn hơn về mặt lịch sử dữ liệu)',
+                ],
+                logic: [
+                    'Chỉ lấy user có role=user, không hiện admin khác',
+                    'Khóa: thêm trường is_banned vào users table — middleware kiểm tra khi login',
+                    'Xem chi tiết: load bookings của user đó kèm nhà hàng',
+                ],
+                guard: ['auth', 'admin']
+            },
+            {
+                id: 'admin-reviews', icon: 'ti-star', label: 'Quản lý đánh giá',
+                title: 'Quản lý đánh giá', route: 'GET /admin/reviews',
+                ui: [
+                    'Filter: nhà hàng, số sao (1-5), ngày viết',
+                    'Bảng: avatar user, tên, nhà hàng, số sao (icon ★), nội dung (truncate 80 ký tự), ngày',
+                    'Action: Xem đầy đủ (expand row hoặc modal), Xóa review',
+                    'Confirm dialog trước khi xóa',
+                ],
+                logic: [
+                    'Chỉ admin xóa review được — user không tự xóa được review của mình',
+                    'Sau khi xóa review: recalculate avg rating của nhà hàng đó (hoặc dùng withAvg real-time)',
+                ],
+                guard: ['auth', 'admin']
+            },
+        ],
+        auth: [
+            {
+                id: 'login', icon: 'ti-login', label: 'Đăng nhập',
+                title: 'Trang đăng nhập', route: 'GET|POST /login',
+                ui: [
+                    'Form: email, password, checkbox "Nhớ mật khẩu"',
+                    'Nút đăng nhập',
+                    'Link "Chưa có tài khoản? Đăng ký"',
+                    'Thông báo lỗi inline nếu sai email/mật khẩu',
+                ],
+                logic: [
+                    'GET: nếu đã login redirect về / hoặc /admin tùy role',
+                    'POST: Auth::attempt(["email"=>$email,"password"=>$pwd], $remember)',
+                    'Nếu thất bại: back()->withErrors(["email"=>"Thông tin không chính xác"])',
+                    'Nếu thành công: redirect dựa vào role — admin→/admin, user→/ (hoặc intended URL)',
+                    'Rate limit: throttle 5 lần/phút tránh brute force',
+                ],
+                guard: ['guest']
+            },
+            {
+                id: 'register', icon: 'ti-user-plus', label: 'Đăng ký',
+                title: 'Trang đăng ký', route: 'GET|POST /register',
+                ui: [
+                    'Form: họ tên, email, SĐT, mật khẩu, xác nhận mật khẩu',
+                    'Nút đăng ký',
+                    'Link "Đã có tài khoản? Đăng nhập"',
+                    'Lỗi validation hiện dưới từng field',
+                ],
+                logic: [
+                    'Validate: email unique, password min:8, confirmed, phone regex VN',
+                    'Hash password: bcrypt($request->password)',
+                    'Tạo user với role=user mặc định',
+                    'Tự động đăng nhập sau khi đăng ký: Auth::login($user)',
+                    'Redirect về trang chủ với flash "Đăng ký thành công"',
+                ],
+                guard: ['guest']
+            },
+            {
+                id: 'profile', icon: 'ti-user', label: 'Hồ sơ cá nhân',
+                title: 'Hồ sơ cá nhân', route: 'GET /profile',
+                ui: [
+                    'Thông tin: avatar (upload), họ tên, email (readonly), SĐT',
+                    'Form đổi mật khẩu: mật khẩu hiện tại, mới, xác nhận',
+                    'Lịch sử đặt bàn gần đây: 5 đơn mới nhất + link xem tất cả',
+                ],
+                logic: [
+                    'Middleware auth',
+                    'Cập nhật: validate UpdateUserRequest, lưu, redirect back với success message',
+                    'Đổi mật khẩu: kiểm tra Hash::check($current, $user->password) trước',
+                ],
+                guard: ['auth']
+            },
+        ]
+    };
+
+    let currentTab = 'frontend';
+    let currentPage = null;
+
+    function switchTab(tab) {
+        currentTab = tab;
+        currentPage = null;
+        document.querySelectorAll('.tab-btn').forEach((b, i) => {
+            b.classList.toggle('active', ['frontend', 'admin', 'auth'][i] === tab);
+        });
+        renderSidebar();
+        document.getElementById('content').innerHTML = '<div class="empty">Chọn trang để xem chi tiết</div>';
+    }
+
+    function renderSidebar() {
+        const list = pages[currentTab];
+        document.getElementById('sidebar').innerHTML = list.map(p => `
+    <button class="page-btn ${currentPage === p.id ? 'active' : ''}" onclick="showPage('${p.id}')">
+      <i class="ti ${p.icon} pi" aria-hidden="true"></i>
+      <span>${p.label}</span>
+    </button>
+  `).join('');
+    }
+
+    function showPage(id) {
+        currentPage = id;
+        renderSidebar();
+        const p = pages[currentTab].find(x => x.id === id);
+        if (!p) return;
+
+        const guardBadges = p.guard.map(g => {
+            if (g === 'auth') return '<span class="badge b-auth"><i class="ti ti-lock" style="font-size:10px"></i> auth</span>';
+            if (g === 'admin') return '<span class="badge b-admin"><i class="ti ti-shield" style="font-size:10px"></i> admin</span>';
+            if (g === 'guest') return '<span class="badge b-get">guest only</span>';
+            if (g === 'owner') return '<span class="badge b-put">owner check</span>';
+            return '';
+        }).join('');
+
+        const methods = p.route.split(' ');
+        const methodBadges = methods.map(m => {
+            const cls = { GET: 'b-get', POST: 'b-post', PUT: 'b-put', DELETE: 'b-del' }[m] || 'b-get';
+            return m.includes('/') ? `<code style="font-size:11px;color:var(--color-text-secondary)">${m}</code>` : `<span class="badge ${cls}">${m}</span>`;
+        }).join(' ');
+
+        const uiItems = p.ui.map(t => `<div class="item"><span class="dot dot-ui"></span><span>${t}</span></div>`).join('');
+        const logicItems = p.logic.map(t => `<div class="item"><span class="dot dot-logic"></span><span>${t}</span></div>`).join('');
+
+        document.getElementById('content').innerHTML = `
+    <div class="page-title">
+      <i class="ti ${p.icon}" style="font-size:18px" aria-hidden="true"></i>
+      ${p.title}
+    </div>
+    <div class="method-row">${methodBadges} ${guardBadges}</div>
+    ${p.ui.length ? `<div class="section"><div class="section-label"><i class="ti ti-layout" style="font-size:11px"></i> UI / Nội dung hiển thị</div><div class="item-list">${uiItems}</div></div>` : ''}
+    ${p.logic.length ? `<div class="divider"></div><div class="section"><div class="section-label"><i class="ti ti-code" style="font-size:11px"></i> Logic / Backend</div><div class="item-list">${logicItems}</div></div>` : ''}
+  `;
+    }
+
+    renderSidebar();
+    showPage(pages[currentTab][0].id);
+</script>

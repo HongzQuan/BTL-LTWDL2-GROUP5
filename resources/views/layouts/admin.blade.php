@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,12 +12,32 @@
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        .sidebar { min-height: 100vh; width: 250px; background-color: #343a40; }
-        .sidebar a { color: #adb5bd; text-decoration: none; padding: 10px 20px; display: block; }
-        .sidebar a:hover, .sidebar a.active { color: #fff; background-color: #495057; }
-        .content-wrapper { flex: 1; background-color: #f8f9fa; }
+        .sidebar {
+            min-height: 100vh;
+            width: 250px;
+            background-color: #343a40;
+        }
+
+        .sidebar a {
+            color: #adb5bd;
+            text-decoration: none;
+            padding: 10px 20px;
+            display: block;
+        }
+
+        .sidebar a:hover,
+        .sidebar a.active {
+            color: #fff;
+            background-color: #495057;
+        }
+
+        .content-wrapper {
+            flex: 1;
+            background-color: #f8f9fa;
+        }
     </style>
 </head>
+
 <body class="d-flex">
 
     <!-- Sidebar -->
@@ -24,10 +45,18 @@
         <h4 class="text-white text-center py-3 border-bottom border-secondary m-0">Admin Panel</h4>
         <div class="mt-3 flex-grow-1">
             <a href="{{ url('/admin') }}" class="active"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a>
-            <a href="{{ route('categories.index') }}"><i class="bi bi-shop me-2"></i> Nhà hàng</a>
+            <!-- Thêm mới nút Danh mục -->
+            <a href="{{ route('categories.index') }}" class="{{ request()->routeIs('categories.*') ? 'active' : '' }}">
+                <i class="bi bi-tags me-2"></i> Danh mục
+            </a>
+
+            <!-- Trả lại nút Nhà hàng về đúng vị trí (tạm thời để dấu #) -->
+            <a href="{{ route('restaurants.index') }}">
+                <i class="bi bi-shop me-2"></i> Nhà hàng
+            </a>
             <a href="#"><i class="bi bi-ui-radios-grid me-2"></i> Bàn ăn</a>
             <a href="#"><i class="bi bi-menu-button-wide me-2"></i> Thực đơn</a>
-            <a href="#"><i class="bi bi-calendar-check me-2"></i> Đặt bàn</a>
+            <a href="{{ route('bookings.index') }}"><i class="bi bi-calendar-check me-2"></i> Đặt bàn</a>
             <a href="{{ route('users.index') }}"><i class="bi bi-people me-2"></i> Khách hàng</a>
             <a href="#"><i class="bi bi-star me-2"></i> Đánh giá</a>
         </div>
@@ -59,4 +88,5 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     @stack('scripts')
 </body>
+
 </html>

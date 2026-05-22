@@ -3,7 +3,7 @@
 @section('content')
 <div class="container-fluid py-4">
     <div class="mb-4">
-        <a href="{{ route('admin.restaurants.index') }}" class="text-decoration-none">&larr; Quay lại danh sách</a>
+        <a href="{{ route('restaurants.store') }}" class="text-decoration-none">&larr; Quay lại danh sách</a>
         <h2 class="mt-2">Thêm Nhà Hàng Mới</h2>
     </div>
 
@@ -20,7 +20,7 @@
 
     <div class="card shadow-sm">
         <div class="card-body">
-            <form action="{{ route('admin.restaurants.store') }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('restaurants.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="row mb-3">
                     <div class="col-md-6">

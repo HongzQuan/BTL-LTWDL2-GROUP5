@@ -7,7 +7,7 @@ use App\Models\Restaurant;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-
+use Illuminate\Support\Str;
 class RestaurantController extends Controller
 {
     public function index(Request $request)
@@ -63,10 +63,10 @@ class RestaurantController extends Controller
         }
 
         $validated['status'] = 1; // Mặc định active khi mới tạo
-
+        $validated['slug'] = Str::slug($validated['name']);
         Restaurant::create($validated);
 
-        return redirect()->route('admin.restaurants.index')->with('success', 'Thêm nhà hàng thành công!');
+        return redirect()->route('restaurants.index')->with('success', 'Thêm nhà hàng thành công!');
     }
 
     public function edit($id)
@@ -105,7 +105,7 @@ class RestaurantController extends Controller
 
         $restaurant->update($validated);
 
-        return redirect()->route('admin.restaurants.index')->with('success', 'Cập nhật nhà hàng thành công!');
+        return redirect()->route('restaurants.index')->with('success', 'Cập nhật nhà hàng thành công!');
     }
 
     public function destroy($id)
@@ -119,7 +119,7 @@ class RestaurantController extends Controller
             ->exists();
 
         if ($hasActiveBookings) {
-            return redirect()->route('admin.restaurants.index')->with('error', 'Không thể vô hiệu hóa! Nhà hàng đang có đơn đặt bàn chờ xử lý hoặc đã xác nhận.');
+            return redirect()->route('restaurants.index')->with('error', 'Không thể vô hiệu hóa! Nhà hàng đang có đơn đặt bàn chờ xử lý hoặc đã xác nhận.');
         }
 
         // Xóa ảnh cũ (nếu muốn giữ lại ảnh cho lịch sử thì bỏ đoạn này)
@@ -133,6 +133,6 @@ class RestaurantController extends Controller
             'image'  => null
         ]);
 
-        return redirect()->route('admin.restaurants.index')->with('success', 'Đã vô hiệu hóa nhà hàng thành công!');
+        return redirect()->route('restaurants.index')->with('success', 'Đã vô hiệu hóa nhà hàng thành công!');
     }
 }

@@ -16,7 +16,7 @@
                 Quản lý tất cả đơn đặt bàn của bạn
             </p>
         </div>
-        <a href="{{ route('restaurants.index') }}" class="btn btn-primary">
+        <a href="{{ url('/') }}" class="btn btn-primary">
             <i class="bi bi-plus-circle me-1"></i>
             Đặt bàn mới
         </a>
@@ -98,7 +98,7 @@
                     Khám phá các nhà hàng và đặt bàn ngay hôm nay!
                 </p>
             @endif
-            <a href="{{ route('restaurants.index') }}" class="btn btn-primary">
+            <a href="{{ url('/') }}" class="btn btn-primary">
                 <i class="bi bi-search me-1"></i>
                 Tìm nhà hàng
             </a>

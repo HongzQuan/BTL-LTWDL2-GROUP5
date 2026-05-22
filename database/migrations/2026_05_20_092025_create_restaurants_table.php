@@ -6,26 +6,29 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up(): void
-    {
-        Schema::create('restaurants', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('category_id')->constrained()->cascadeOnDelete();
-            $table->string('name');
-            $table->string('slug')->unique();
-            $table->string('address');
-            $table->string('city');
-            $table->string('district');
-            $table->string('phone');
-            $table->text('description');
-            $table->string('image')->nullable();
-            $table->time('open_time');
-            $table->time('close_time');
-            $table->decimal('price_range', 8, 2);
-            $table->tinyInteger('status')->default(1);
-            $table->timestamps();
-        });
-    }
+    public function up()
+{
+    Schema::create('restaurants', function (Blueprint $table) {
+        $table->id();
+        $table->string('name'); // Tên là bắt buộc
+        $table->string('slug'); 
+        $table->foreignId('category_id'); // Danh mục bắt buộc
+        $table->string('address'); // Địa chỉ bắt buộc
+        $table->string('city'); // Thành phố bắt buộc
+        
+        // CÁC CỘT DƯỚI ĐÂY NÊN CHO PHÉP TRỐNG (Thêm ->nullable())
+        $table->string('district')->nullable();
+        $table->text('description')->nullable();
+        $table->string('price_range')->nullable(); // Thêm dòng này để fix lỗi hiện tại
+        $table->string('phone')->nullable();
+        $table->time('open_time')->nullable();
+        $table->time('close_time')->nullable();
+        $table->string('image')->nullable();
+        $table->boolean('status')->default(1);
+        
+        $table->timestamps();
+    });
+}
 
     public function down(): void
     {

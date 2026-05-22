@@ -11,9 +11,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        // Đăng ký alias cho middleware tại đây
+        // THÊM ĐOẠN KHAI BÁO ALIAS NÀY VÀO
         $middleware->alias([
-            'booking.owner' => \App\Http\Middleware\EnsureBookingOwner::class,
+            'admin' => \App\Http\Middleware\AdminMiddleware::class,
+            'booking.owner' => \App\Http\Middleware\CheckBookingOwner::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

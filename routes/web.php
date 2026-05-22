@@ -6,7 +6,8 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\BookingController as AdminBookingController;
-
+use App\Http\Controllers\Admin\RestaurantController;
+use Illuminate\Support\Facades\File;
 // ==========================================
 // ROUTES CHO XÁC THỰC (ĐĂNG NHẬP / ĐĂNG KÝ)
 // ==========================================
@@ -26,47 +27,46 @@ Route::middleware(['auth', 'admin'])
     ->prefix('admin')
     ->group(function () {
 
-    Route::get('/', [DashboardController::class, 'index'])
-        ->name('admin.dashboard');
+        Route::get('/', [DashboardController::class, 'index'])
+            ->name('admin.dashboard');
 
-    Route::resource('categories', CategoryController::class);
+        Route::resource('categories', CategoryController::class);
 
-    Route::resource('users', UserController::class);
+        Route::resource('users', UserController::class);
 
+        Route::resource('restaurants', RestaurantController::class);
+        // ==========================
+        // ADMIN BOOKING
+        // ==========================
 
-    // ==========================
-    // ADMIN BOOKING
-    // ==========================
+        Route::get(
+            'bookings',
+            [AdminBookingController::class, 'index']
+        )->name(
+            'admin.bookings.index'
+        );
 
-    Route::get(
-        'bookings',
-        [AdminBookingController::class, 'index']
-    )->name(
-        'admin.bookings.index'
-    );
+        Route::put(
+            'bookings/{id}/confirm',
+            [AdminBookingController::class, 'confirm']
+        )->name(
+            'admin.bookings.confirm'
+        );
 
-    Route::put(
-        'bookings/{id}/confirm',
-        [AdminBookingController::class, 'confirm']
-    )->name(
-        'admin.bookings.confirm'
-    );
+        Route::put(
+            'bookings/{id}/cancel',
+            [AdminBookingController::class, 'cancel']
+        )->name(
+            'admin.bookings.cancel'
+        );
 
-    Route::put(
-        'bookings/{id}/cancel',
-        [AdminBookingController::class, 'cancel']
-    )->name(
-        'admin.bookings.cancel'
-    );
-
-    Route::put(
-        'bookings/{id}/complete',
-        [AdminBookingController::class, 'complete']
-    )->name(
-        'admin.bookings.complete'
-    );
-
-});
+        Route::put(
+            'bookings/{id}/complete',
+            [AdminBookingController::class, 'complete']
+        )->name(
+            'admin.bookings.complete'
+        );
+    });
 
 
 use App\Http\Controllers\HomeController;
@@ -89,3 +89,21 @@ Route::middleware(['auth'])->group(function () {
 
 
 
+Route::get('/category/{slug}', [App\Http\Controllers\HomeController::class, 'category'])->name('frontend.category');
+Route::get('/category/{slug}', function ($slug) {
+    return "Trang hiển thị các nhà hàng thuộc danh mục: " . $slug;
+})->name('frontend.category');
+
+
+
+
+Route::get('/storage/restaurants/{filename}', function ($filename) {
+    $path = storage_path('app/public/restaurants/' . $filename);
+
+    if (!file_exists($path)) {
+        abort(404);
+    }
+
+    // Dùng helper response() có sẵn của Laravel để xuất file trực tiếp
+    return response()->file($path);
+});

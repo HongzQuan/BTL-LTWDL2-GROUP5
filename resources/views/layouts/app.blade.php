@@ -20,7 +20,7 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item"><a class="nav-link" href="{{ url('/') }}">Trang chủ</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#">Danh sách Nhà hàng</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url('/restaurants') }}">Danh sách Nhà hàng</a></li>
                 </ul>
                 <ul class="navbar-nav">
                     @auth

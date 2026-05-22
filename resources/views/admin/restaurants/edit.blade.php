@@ -3,7 +3,7 @@
 @section('content')
 <div class="container-fluid py-4">
     <div class="mb-4">
-        <a href="{{ route('admin.restaurants.index') }}" class="text-decoration-none">&larr; Quay lại danh sách</a>
+        <a href="{{ route('restaurants.index') }}" class="text-decoration-none">&larr; Quay lại danh sách</a>
         <h2 class="mt-2">Chỉnh Sửa Nhà Hàng: {{ $restaurant->name }}</h2>
     </div>
 
@@ -20,7 +20,7 @@
 
     <div class="card shadow-sm">
         <div class="card-body">
-            <form action="{{ route('admin.restaurants.update', $restaurant->id) }}" method="POST"
+            <form action="{{ route('restaurants.update', $restaurant->id) }}" method="POST"
                 enctype="multipart/form-data">
                 @csrf
                 @method('PUT')

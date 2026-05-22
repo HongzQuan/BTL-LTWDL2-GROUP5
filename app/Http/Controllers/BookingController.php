@@ -15,11 +15,6 @@ class BookingController extends Controller
     /**
      * Áp dụng auth middleware cho toàn bộ controller.
      */
-    public function __construct()
-    {
-       
-    }
-
     // =========================================================
     // CREATE — Hiển thị form đặt bàn
     // GET /bookings/create?restaurant_id=&date=&time=&guests=
@@ -170,7 +165,19 @@ class BookingController extends Controller
         $booking = $request->attributes->get('booking');
 
         // Load thêm relationships cần thiết
-        $booking->load(['restaurant', 'table', 'user']);
+        if (!$booking) {
+            $booking = Booking::with([
+                'restaurant',
+                'table',
+                'user'
+            ])->findOrFail($id);
+        }
+
+        $booking->load([
+            'restaurant',
+            'table',
+            'user'
+        ]);
 
         // Có thể hủy không?
         $canCancel = $booking->status === 'pending';
@@ -178,10 +185,17 @@ class BookingController extends Controller
         // Có thể review không?
         // Điều kiện: đã hoàn thành VÀ chưa có review của user này tại nhà hàng này
         $canReview = false;
-        if ($booking->status === 'completed') {
+        if (
+            $booking->status === 'completed'
+            && $booking->restaurant
+            && method_exists($booking->restaurant, 'reviews')
+        ) {
             $canReview = ! $booking->restaurant
-                ->reviews()                          // hasMany Review
-                ->where('user_id', auth()->id())
+                ->reviews()
+                ->where(
+                    'user_id',
+                    auth()->id()
+                )
                 ->exists();
         }
 
@@ -197,7 +211,9 @@ class BookingController extends Controller
     {
         /** @var Booking $booking */
         $booking = $request->attributes->get('booking');
-
+        if (!$booking) {
+            $booking = Booking::findOrFail($id);
+        }
         // Chỉ cho hủy khi đang ở trạng thái pending
         if ($booking->status !== 'pending') {
             return redirect()

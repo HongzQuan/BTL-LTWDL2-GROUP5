@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\BookingController as AdminBookingController;
 
 // ==========================================
 // ROUTES CHO XÁC THỰC (ĐĂNG NHẬP / ĐĂNG KÝ)
@@ -21,11 +22,50 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 // ROUTES CHO QUẢN TRỊ VIÊN (ADMIN)
 // ==========================================
 // Áp dụng middleware 'auth' (bắt buộc đăng nhập) và 'admin' (bắt buộc role admin)
-Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
-    Route::get('/', [DashboardController::class, 'index'])->name('admin.dashboard');
+Route::middleware(['auth', 'admin'])
+    ->prefix('admin')
+    ->group(function () {
+
+    Route::get('/', [DashboardController::class, 'index'])
+        ->name('admin.dashboard');
+
     Route::resource('categories', CategoryController::class);
+
     Route::resource('users', UserController::class);
-    // Sau này bạn sẽ thêm các route quản lý nhà hàng, user, booking... ở trong này
+
+
+    // ==========================
+    // ADMIN BOOKING
+    // ==========================
+
+    Route::get(
+        'bookings',
+        [AdminBookingController::class, 'index']
+    )->name(
+        'admin.bookings.index'
+    );
+
+    Route::put(
+        'bookings/{id}/confirm',
+        [AdminBookingController::class, 'confirm']
+    )->name(
+        'admin.bookings.confirm'
+    );
+
+    Route::put(
+        'bookings/{id}/cancel',
+        [AdminBookingController::class, 'cancel']
+    )->name(
+        'admin.bookings.cancel'
+    );
+
+    Route::put(
+        'bookings/{id}/complete',
+        [AdminBookingController::class, 'complete']
+    )->name(
+        'admin.bookings.complete'
+    );
+
 });
 
 

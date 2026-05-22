@@ -282,19 +282,144 @@
 
     <!-- Thêm hiệu ứng hover nhẹ nhàng bằng CSS inline cho gọn -->
     <style>
-        .hover-shadow:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 .5rem 1.5rem rgba(0, 0, 0, .08) !important;
-        }
+    .hover-shadow:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 .5rem 1.5rem rgba(0, 0, 0, .08) !important;
+    }
 
-        .transition-all {
-            transition: all 0.3s ease;
-        }
+    .transition-all {
+        transition: all 0.3s ease;
+    }
 
-        .backdrop-blur {
-            backdrop-filter: blur(4px);
-        }
+    .backdrop-blur {
+        backdrop-filter: blur(4px);
+    }
     </style>
+    @endsection
+    @extends('layouts.admin')
+
+    @section('content')
+    <div class="container-fluid py-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0">Quản lý Nhà hàng</h2>
+            <a href="{{ route('admin.restaurants.create') }}" class="btn btn-primary">
+                + Thêm nhà hàng
+            </a>
+        </div>
+
+        <!-- Flash Messages -->
+        @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        @endif
+
+        @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        @endif
+
+        <!-- Bộ lọc -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-body">
+                <form action="{{ route('admin.restaurants.index') }}" method="GET" class="row g-3">
+                    <div class="col-md-3">
+                        <input type="text" name="city" class="form-control" placeholder="Tìm theo thành phố..."
+                            value="{{ request('city') }}">
+                    </div>
+                    <div class="col-md-3">
+                        <select name="category_id" class="form-select">
+                            <option value="">-- Tất cả danh mục --</option>
+                            @foreach($categories as $cat)
+                            <option value="{{ $cat->id }}" {{ request('category_id') == $cat->id ? 'selected' : '' }}>
+                                {{ $cat->name }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select name="status" class="form-select">
+                            <option value="">-- Tất cả trạng thái --</option>
+                            <option value="1" {{ request('status') === '1' ? 'selected' : '' }}>Hoạt động</option>
+                            <option value="0" {{ request('status') === '0' ? 'selected' : '' }}>Ngừng hoạt động</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-secondary w-100">Lọc Dữ Liệu</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Bảng dữ liệu -->
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Ảnh</th>
+                                <th>Tên nhà hàng</th>
+                                <th>Danh mục</th>
+                                <th>Thành phố</th>
+                                <th>Trạng thái</th>
+                                <th class="text-center">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($restaurants as $item)
+                            <tr>
+                                <td>{{ $item->id }}</td>
+                                <td>
+                                    @if($item->image)
+                                    <img src="{{ asset('storage/' . $item->image) }}" alt="Ảnh" class="rounded"
+                                        style="width: 60px; height: 40px; object-fit: cover;">
+                                    @else
+                                    <span class="text-muted small">No Image</span>
+                                    @endif
+                                </td>
+                                <td class="fw-bold">{{ $item->name }}</td>
+                                <td>{{ $item->category->name ?? 'N/A' }}</td>
+                                <td>{{ $item->city }}</td>
+                                <td>
+                                    @if($item->status == 1)
+                                    <span class="badge bg-success">Hoạt động</span>
+                                    @else
+                                    <span class="badge bg-danger">Ngừng HĐ</span>
+                                    @endif
+                                </td>
+                                <td class="text-center">
+                                    <a href="{{ route('admin.restaurants.edit', $item->id) }}"
+                                        class="btn btn-sm btn-warning">Sửa</a>
+                                    @if($item->status == 1)
+                                    <form action="{{ route('admin.restaurants.destroy', $item->id) }}" method="POST"
+                                        class="d-inline-block"
+                                        onsubmit="return confirm('Bạn có chắc muốn vô hiệu hóa nhà hàng này?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-danger">Tắt</button>
+                                    </form>
+                                    @endif
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="7" class="text-center py-4">Không tìm thấy nhà hàng nào.</td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer bg-white">
+                {{ $restaurants->withQueryString()->links() }}
+            </div>
+        </div>
+    </div>
     @endsection
 </body>
 

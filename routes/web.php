@@ -44,6 +44,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/restaurants/search', [RestaurantController::class, 'search'])->name('restaurants.search');
 Route::get('/restaurants', [RestaurantController::class, 'index'])->name('restaurants.index');
 Route::get('/restaurants/{id}', [RestaurantController::class, 'show'])->name('restaurants.show');
+Route::get('/my-bookings', [App\Http\Controllers\BookingController::class, 'history'])->name('bookings.history');
 
 // Chức năng yêu cầu đăng nhập (Đặt bàn, Đánh giá)
 Route::middleware('auth')->group(function () {
@@ -57,6 +58,7 @@ Route::middleware('auth')->group(function () {
 
     // Đánh giá
     Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+    
 });
 
 // ==========================================

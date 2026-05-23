@@ -53,4 +53,9 @@ class Booking extends Model
     {
         return $this->belongsTo(Table::class);
     }
+
+    public function scopeStatus($query, $status)
+{
+    return $status ? $query->where('status', $status) : $query;
+}
 }

@@ -32,7 +32,7 @@
                                 @if(Auth::user()->isAdmin())
                                     <li><a class="dropdown-item" href="{{ url('/admin') }}">Trang Quản trị</a></li>
                                 @endif
-                                <li><a class="dropdown-item" href="#">Lịch sử đặt bàn</a></li>
+                                <li><a class="dropdown-item" href="{{ route('bookings.index') }}">Lịch sử đặt bàn</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <form action="{{ route('logout') }}" method="POST">

@@ -8,6 +8,7 @@ use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+
 class RestaurantController extends Controller
 {
     public function index(Request $request)
@@ -34,6 +35,8 @@ class RestaurantController extends Controller
         $restaurants = $query->orderBy('created_at', 'desc')->paginate(15);
 
         return view('admin.restaurants.index', compact('restaurants', 'categories'));
+        
+
     }
 
     public function create()

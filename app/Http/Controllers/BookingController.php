@@ -227,4 +227,18 @@ class BookingController extends Controller
             ->back()
             ->with('success', "Đã hủy đơn đặt bàn #{$booking->id} thành công.");
     }
+
+    public function history(Request $request)
+{
+    // Lấy trạng thái từ filter, nếu không có thì lấy tất cả
+    $status = $request->status; 
+    
+    $bookings = \App\Models\Booking::where('user_id', auth()->id())
+                    ->with('restaurant')
+                    ->status($status) // Dùng scope đã tạo
+                    ->latest()
+                    ->get();
+
+    return view('bookings.history', compact('bookings', 'status'));
+}
 }

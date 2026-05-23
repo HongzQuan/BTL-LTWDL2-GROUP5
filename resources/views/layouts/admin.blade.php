@@ -53,7 +53,7 @@
             </a>
 
             <!-- Trả lại nút Nhà hàng về đúng vị trí (tạm thời để dấu #) -->
-            <a href="{{ route('restaurants.index') }}">
+            <a href="{{ route('admin.restaurants.index') }}">
                 <i class="bi bi-shop me-2"></i> Nhà hàng
             </a>
             <a href="{{ route('admin.tables.index') }}" class="{{ request()->routeIs('admin.tables.*') ? 'active' : '' }}">

@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- KHAI BÁO CSRF TOKEN Ở ĐÂY -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Admin Dashboard - Hệ thống đặt bàn</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -56,7 +58,7 @@
             </a>
             <a href="#"><i class="bi bi-ui-radios-grid me-2"></i> Bàn ăn</a>
             <a href="#"><i class="bi bi-menu-button-wide me-2"></i> Thực đơn</a>
-            <a href="{{ route('bookings.index') }}"><i class="bi bi-calendar-check me-2"></i> Đặt bàn</a>
+            <a href="{{ route('admin.bookings.index') }}"  class="{{ request()->routeIs('admin.bookings.*') ? 'active' : '' }}"><i class="bi bi-calendar-check me-2"></i> Đặt bàn</a>
             <a href="{{ route('users.index') }}"><i class="bi bi-people me-2"></i> Khách hàng</a>
             <a href="#"><i class="bi bi-star me-2"></i> Đánh giá</a>
         </div>

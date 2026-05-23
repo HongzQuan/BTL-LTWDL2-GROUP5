@@ -48,7 +48,7 @@
         <div class="mt-3 flex-grow-1">
             <a href="{{ url('/admin') }}" class="active"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a>
             <!-- Thêm mới nút Danh mục -->
-            <a href="{{ route('categories.index') }}" class="{{ request()->routeIs('categories.*') ? 'active' : '' }}">
+            <a href="{{ route('admin.categories.index') }}" class="{{ request()->routeIs('admin.categories.*') ? 'active' : '' }}">
                 <i class="bi bi-tags me-2"></i> Danh mục
             </a>
 
@@ -56,11 +56,13 @@
             <a href="{{ route('restaurants.index') }}">
                 <i class="bi bi-shop me-2"></i> Nhà hàng
             </a>
-            <a href="#"><i class="bi bi-ui-radios-grid me-2"></i> Bàn ăn</a>
-            <a href="#"><i class="bi bi-menu-button-wide me-2"></i> Thực đơn</a>
-            <a href="{{ route('admin.bookings.index') }}"  class="{{ request()->routeIs('admin.bookings.*') ? 'active' : '' }}"><i class="bi bi-calendar-check me-2"></i> Đặt bàn</a>
-            <a href="{{ route('users.index') }}"><i class="bi bi-people me-2"></i> Khách hàng</a>
-            <a href="#"><i class="bi bi-star me-2"></i> Đánh giá</a>
+            <a href="{{ route('admin.tables.index') }}" class="{{ request()->routeIs('admin.tables.*') ? 'active' : '' }}">
+                <i class="bi bi-grid-3x3-gap me-2"></i> Bàn ăn
+            </a>
+            <a href="{{ route('admin.menus.index') }}"><i class="bi bi-menu-button-wide me-2"></i> Thực đơn</a>
+            <a href="{{ route('admin.bookings.index') }}" class="{{ request()->routeIs('admin.bookings.*') ? 'active' : '' }}"><i class="bi bi-calendar-check me-2"></i> Đặt bàn</a>
+            <a href="{{ route('admin.users.index') }}"><i class="bi bi-people me-2"></i> Khách hàng</a>
+            <a href="{{ route('admin.reviews.index') }}"><i class="bi bi-star me-2"></i> Đánh giá</a>
         </div>
     </div>
 

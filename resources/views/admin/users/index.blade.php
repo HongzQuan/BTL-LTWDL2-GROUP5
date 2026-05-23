@@ -39,9 +39,6 @@
                             <span class="badge bg-success">Hoạt động</span>
                         @endif
                     </td>
-                    <td class="text-end">
-                        <a href="{{ route('users.edit', $user) }}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
-                    </td>
                 </tr>
                 @endforeach
             </tbody>

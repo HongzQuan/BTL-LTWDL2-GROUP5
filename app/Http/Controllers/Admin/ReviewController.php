@@ -1,46 +1,47 @@
 <?php
-// app/Http/Controllers/Admin/ReviewController.php
 
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use App\Models\Review;
 use App\Models\Restaurant;
-use Illuminate\Http\Request;
 
 class ReviewController extends Controller
 {
 
-    // ── Danh sách reviews ─────────────────────────────────────────────────
     public function index(Request $request)
     {
-        $query = Review::with(['user', 'restaurant'])
-            ->latest();
+        // Eager load user và restaurant
+        $query = Review::with(['user', 'restaurant']);
 
-        // Filter theo nhà hàng
+        // Lọc theo nhà hàng
         if ($request->filled('restaurant_id')) {
-            $query->where('restaurant_id', $request->integer('restaurant_id'));
+            $query->where('restaurant_id', $request->restaurant_id);
         }
 
-        // Filter theo rating
+        // Lọc theo số sao (1-5)
         if ($request->filled('rating')) {
-            $query->where('rating', $request->integer('rating'));
+            $query->where('rating', $request->rating);
         }
 
-        $reviews     = $query->paginate(20)->withQueryString();
-        $restaurants = Restaurant::orderBy('name')->get(['id', 'name']);
+        $reviews = $query->orderBy('created_at', 'DESC')->paginate(20)->appends($request->all());
+        $restaurants = Restaurant::all();
 
-        return view('admin.reviews.index', compact('reviews', 'restaurants'));
+        // Lấy thống kê tổng số lượng review theo từng mức sao (để hiển thị badge)
+        $ratingStats = Review::selectRaw('rating, COUNT(*) as total')
+            ->groupBy('rating')
+            ->pluck('total', 'rating')
+            ->toArray();
+
+        return view('admin.reviews.index', compact('reviews', 'restaurants', 'ratingStats'));
     }
 
-    // ── Xóa review ────────────────────────────────────────────────────────
     public function destroy($id)
     {
         $review = Review::findOrFail($id);
         $review->delete();
 
-        return redirect()
-            ->route('admin.reviews.index')
-            ->with('success', 'Đã xóa đánh giá thành công.');
+        return redirect()->route('admin.reviews.index')->with('success', 'Đã xóa đánh giá');
     }
 }

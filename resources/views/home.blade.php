@@ -36,7 +36,7 @@
     <div class="row mb-5">
         @foreach($categories as $category)
         <div class="col-auto mb-2">
-            <a href="{{ route('frontend.category', $category->slug) }}" class="btn btn-outline-primary rounded-pill px-4">{{ $category->name }}</a>
+            <a href="{{ route('restaurants.index', ['category_id' => $category->id]) }}" class="btn btn-outline-primary rounded-pill px-4">{{ $category->name }}</a>
         </div>
         @endforeach
     </div>
@@ -50,11 +50,16 @@
         @foreach($topRestaurants as $restaurant)
         <div class="col-md-3 mb-4">
             <div class="card h-100 shadow-sm">
-                <img src="{{ asset('storage/' . $restaurant->image) }}" class="card-img-top" style="height: 180px; object-fit: cover;">
+                <img src="{{ $restaurant->image ? asset('storage/' . $restaurant->image) : 'https://placehold.co/600x400?text=Chua+co+anh' }}"
+                    class="card-img-top object-fit-cover"
+                    alt="{{ $restaurant->name }}"
+                    style="height: 200px;">
                 <div class="card-body">
                     <h6 class="card-title fw-bold">{{ $restaurant->name }}</h6>
                     <p class="small text-muted"><i class="bi bi-geo-alt"></i> {{ $restaurant->city }}</p>
-                    <a href="#" class="btn btn-sm btn-outline-primary w-100" @guest onclick="event.preventDefault(); window.location.href='/login';" @endguest>Đặt bàn ngay</a>
+                    <a href="{{ route('restaurants.show', $restaurant->id) }}" class="btn btn-outline-primary w-100">
+                        Đặt bàn ngay
+                    </a>
                 </div>
             </div>
         </div>

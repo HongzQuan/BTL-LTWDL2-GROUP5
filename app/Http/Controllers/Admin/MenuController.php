@@ -13,7 +13,7 @@ use Illuminate\Validation\Rule;
 class MenuController extends Controller
 {
     // Các loại món (đồng bộ với ENUM/giá trị trong DB)
-    private const MENU_TYPES = ['food', 'drink', 'dessert', 'combo'];
+    private const MENU_TYPES = ['khai_vi', 'mon_chinh', 'trang_mieng', 'do_uong'];
 
     // ─────────────────────────────────────────────────────────────────────
     // INDEX

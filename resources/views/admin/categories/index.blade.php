@@ -3,7 +3,7 @@
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h3 class="mb-0">Quản lý Danh mục</h3>
-    <a href="{{ route('categories.create') }}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Thêm mới</a>
+    <a href="{{ route('admin.categories.create') }}" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Thêm mới</a>
 </div>
 
 @if(session('success'))
@@ -30,8 +30,8 @@
                     <td>{{ $category->slug }}</td>
                     <td>{{ Str::limit($category->description, 50) }}</td>
                     <td class="text-end">
-                        <a href="{{ route('categories.edit', $category) }}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
-                        <form action="{{ route('categories.destroy', $category) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc muốn xóa?');">
+                        <a href="{{ route('admin.categories.edit', $category) }}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
+                        <form action="{{ route('admin.categories.destroy', $category) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc muốn xóa?');">
                             @csrf
                             @method('DELETE')
                             <button class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button>

@@ -4,7 +4,7 @@
 <div class="card shadow-sm col-md-8 mx-auto">
     <div class="card-header bg-white fw-bold">Thêm Danh mục mới</div>
     <div class="card-body">
-        <form action="{{ route('categories.store') }}" method="POST">
+        <form action="{{ route('admin.categories.store') }}" method="POST">
             @csrf
             <div class="mb-3">
                 <label class="form-label">Tên danh mục</label>
@@ -16,7 +16,7 @@
                 <textarea name="description" class="form-control" rows="4">{{ old('description') }}</textarea>
             </div>
             <button type="submit" class="btn btn-primary">Lưu lại</button>
-            <a href="{{ route('categories.index') }}" class="btn btn-secondary">Hủy</a>
+            <a href="{{ route('admin.categories.index') }}" class="btn btn-secondary">Hủy</a>
         </form>
     </div>
 </div>

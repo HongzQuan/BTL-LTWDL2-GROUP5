@@ -92,7 +92,7 @@ class RestaurantController extends Controller
         }
 
         // Lấy 4 nhà hàng tương tự (cùng category, khác nhà hàng hiện tại)
-        $similarRestaurants = Restaurant::active()
+        $similar = Restaurant::active()
             ->where('category_id', $restaurant->category_id)
             ->where('id', '!=', $restaurant->id)
             ->inRandomOrder()
@@ -108,7 +108,7 @@ class RestaurantController extends Controller
                 ->exists();
         }
 
-        return view('restaurants.show', compact('restaurant', 'ratingDistribution', 'similarRestaurants', 'canReview'));
+        return view('restaurants.show', compact('restaurant', 'ratingDistribution', 'similar', 'canReview'));
     }
 
     /**

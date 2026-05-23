@@ -30,7 +30,7 @@
             </div>
 
             <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
-            <a href="{{ route('users.index') }}" class="btn btn-secondary">Hủy</a>
+            <a href="{{ route('admin.users.index') }}" class="btn btn-secondary">Hủy</a>
         </form>
     </div>
 </div>

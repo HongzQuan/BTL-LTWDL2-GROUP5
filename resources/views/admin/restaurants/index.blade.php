@@ -1,133 +1,109 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="container py-4">
-
-    <!-- THANH FILTER NGANG -->
-    <div class="card border-0 shadow-sm mb-4">
-        <div class="card-body p-4">
-            <form action="{{ route('restaurants.index') }}" method="GET" class="row g-3 align-items-end">
-                @if(request('sort'))
-                <input type="hidden" name="sort" value="{{ request('sort') }}">
-                @endif
-
-                <div class="col-md-2 col-sm-6">
-                    <label class="form-label fw-semibold small text-muted">Thành phố</label>
-                    <select name="city" class="form-select">
-                        <option value="">Tất cả</option>
-                        @foreach($cities as $city)
-                        <option value="{{ $city }}" {{ request('city') == $city ? 'selected' : '' }}>{{ $city }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div class="col-md-2 col-sm-6">
-                    <label class="form-label fw-semibold small text-muted">Danh mục</label>
-                    <select name="category_id" class="form-select">
-                        <option value="">Tất cả</option>
-                        @foreach($categories as $category)
-                        <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div class="col-md-2 col-sm-6">
-                    <label class="form-label fw-semibold small text-muted">Giá tối thiểu</label>
-                    <input type="number" name="price_min" class="form-control" value="{{ request('price_min') }}" placeholder="VD: 100000">
-                </div>
-
-                <div class="col-md-2 col-sm-6">
-                    <label class="form-label fw-semibold small text-muted">Giá tối đa</label>
-                    <input type="number" name="price_max" class="form-control" value="{{ request('price_max') }}" placeholder="VD: 2000000">
-                </div>
-
-                <div class="col-md-3 col-sm-8">
-                    <label class="form-label fw-semibold small text-muted">Từ khóa</label>
-                    <input type="text" name="q" class="form-control" value="{{ request('q') }}" placeholder="Tên hoặc địa chỉ...">
-                </div>
-
-                <div class="col-md-1 col-sm-4">
-                    <button type="submit" class="btn btn-primary w-100">Lọc</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- THANH SẮP XẾP & THÔNG TIN KẾT QUẢ -->
-    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-4 gap-3">
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <p class="text-muted mb-0">Tìm thấy <strong class="text-dark">{{ $restaurants->total() }}</strong> nhà hàng phù hợp</p>
+            <h2 class="fw-bold text-dark m-0">Quản lý Nhà hàng</h2>
+            <p class="text-muted mb-0 mt-1">Danh sách tất cả các nhà hàng đang hoạt động trên hệ thống</p>
         </div>
-
-        <div class="btn-group shadow-sm" role="group">
-            @php $currentParams = request()->except('sort'); @endphp
-            <a href="{{ route('restaurants.index', array_merge($currentParams, ['sort' => 'rating'])) }}" class="btn btn-outline-secondary btn-sm {{ request('sort') == 'rating' ? 'active' : '' }}">Nổi bật</a>
-            <a href="{{ route('restaurants.index', array_merge($currentParams, ['sort' => 'newest'])) }}" class="btn btn-outline-secondary btn-sm {{ (!request('sort') || request('sort') == 'newest') ? 'active' : '' }}">Mới nhất</a>
-            <a href="{{ route('restaurants.index', array_merge($currentParams, ['sort' => 'price_asc'])) }}" class="btn btn-outline-secondary btn-sm {{ request('sort') == 'price_asc' ? 'active' : '' }}">Giá ↑</a>
-            <a href="{{ route('restaurants.index', array_merge($currentParams, ['sort' => 'price_desc'])) }}" class="btn btn-outline-secondary btn-sm {{ request('sort') == 'price_desc' ? 'active' : '' }}">Giá ↓</a>
-        </div>
+        <a href="{{ route('admin.restaurants.create') }}" class="btn btn-primary fw-bold shadow-sm px-4">
+            + Thêm nhà hàng mới
+        </a>
     </div>
 
-    <!-- GRID DANH SÁCH NHÀ HÀNG -->
-    <div class="row row-cols-1 row-cols-md-3 g-4">
-        @forelse($restaurants as $restaurant)
-        <div class="col">
-            <div class="card h-100 border-0 shadow-sm hover-shadow transition-all position-relative">
-                <div class="position-relative overflow-hidden rounded-top" style="aspect-ratio: 4/3;">
-                    <img src="{{ $restaurant->image ? asset('storage/' . $restaurant->image) : 'https://placehold.co/600x450?text=No+Image' }}" class="w-100 h-100 object-fit-cover" alt="{{ $restaurant->name }}">
-                    <span class="position-absolute top-0 start-0 m-3 badge bg-dark bg-opacity-75 backdrop-blur py-2 px-3 fs-7">{{ $restaurant->category->name }}</span>
-                </div>
-                <div class="card-body d-flex flex-column p-4">
-                    <h5 class="card-title fw-bold mb-2">
-                        <a href="{{ url('/restaurants/' . $restaurant->id) }}" class="text-decoration-none text-dark link-primary">{{ $restaurant->name }}</a>
-                    </h5>
-                    <p class="card-text text-muted small mb-3 text-truncate">📍 {{ $restaurant->address }}, {{ $restaurant->district }}, {{ $restaurant->city }}</p>
-                    <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top border-light">
-                        <div>
-                            <span class="text-warning fw-bold">★</span>
-                            <span class="fw-bold text-dark">{{ round($restaurant->average_rating ?? 0, 1) }}</span>
-                        </div>
-                        <div class="small text-muted">🕒 {{ \Carbon\Carbon::parse($restaurant->open_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($restaurant->close_time)->format('H:i') }}</div>
-                    </div>
-                </div>
-                <div class="position-absolute bottom-0 end-0 m-4 mb-5 pb-2">
-                    @php
-                    $priceBadge = '$';
-                    if($restaurant->price_range > 1000000) $priceBadge = '$$$';
-                    elseif($restaurant->price_range > 300000) $priceBadge = '$$';
-                    @endphp
-                    <span class="badge bg-light text-success border border-success border-opacity-25">{{ $priceBadge }}</span>
-                </div>
+    <!-- Thông báo Success -->
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show shadow-sm border-0" role="alert">
+            <strong class="me-1">Thành công!</strong> {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    <!-- Card Bảng dữ liệu -->
+    <div class="card border-0 shadow-sm overflow-hidden">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col" class="ps-4 text-center text-secondary" style="width: 5%;">ID</th>
+                            <th scope="col" class="text-secondary" style="width: 15%;">Hình ảnh</th>
+                            <th scope="col" class="text-secondary" style="width: 25%;">Thông tin nhà hàng</th>
+                            <th scope="col" class="text-secondary" style="width: 20%;">Địa điểm</th>
+                            <th scope="col" class="text-secondary" style="width: 15%;">Trạng thái</th>
+                            <th scope="col" class="text-end pe-4 text-secondary" style="width: 20%;">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($restaurants as $restaurant)
+                        <tr>
+                            <td class="ps-4 text-center fw-semibold text-muted">#{{ $restaurant->id }}</td>
+                            <td>
+                                <img src="{{ $restaurant->image_url ?? 'https://placehold.co/100x75?text=No+Image' }}" 
+                                     alt="{{ $restaurant->name }}" 
+                                     class="rounded shadow-sm object-fit-cover" 
+                                     style="width: 90px; height: 65px;">
+                            </td>
+                            <td>
+                                <p class="fw-bold text-dark mb-1">{{ $restaurant->name }}</p>
+                                <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25">
+                                    {{ $restaurant->category->name ?? 'Chưa phân loại' }}
+                                </span>
+                            </td>
+                            <td>
+                                <p class="mb-1 small fw-semibold">📍 {{ $restaurant->city }}</p>
+                                @if($restaurant->district)
+                                    <p class="mb-0 text-muted small">{{ $restaurant->district }}</p>
+                                @endif
+                            </td>
+                            <td>
+                                <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-2 py-1">
+                                    Đang hoạt động
+                                </span>
+                            </td>
+                            <td class="text-end pe-4">
+                                <div class="btn-group" role="group">
+                                    <!-- Nút Sửa -->
+                                    <a href="{{ route('admin.restaurants.edit', $restaurant->id) }}" 
+                                       class="btn btn-sm btn-outline-primary" title="Chỉnh sửa">
+                                        Sửa
+                                    </a>
+                                    <!-- Nút Xóa (Dùng Form vì Route Destroy bắt buộc method DELETE) -->
+                                    <form action="{{ route('admin.restaurants.destroy', $restaurant->id) }}" 
+                                          method="POST" 
+                                          class="d-inline-block m-0" 
+                                          onsubmit="return confirm('Bạn có chắc chắn muốn xóa nhà hàng [{{ $restaurant->name }}] không? Hành động này không thể hoàn tác!');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Xóa">
+                                            Xóa
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="6" class="text-center py-5 text-muted">
+                                <div class="fs-1 mb-3">🍽️</div>
+                                <h5 class="fw-bold">Chưa có dữ liệu nhà hàng</h5>
+                                <p>Hệ thống hiện tại chưa có nhà hàng nào. Hãy bấm "Thêm nhà hàng mới" để bắt đầu!</p>
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
         </div>
-        @empty
-        <div class="col-12 py-5 text-center">
-            <div class="mb-3 fs-1 text-muted">🍽️</div>
-            <h4 class="fw-bold text-secondary">Không tìm thấy kết quả phù hợp</h4>
-            <p class="text-muted">Bạn hãy thử thay đổi bộ lọc hoặc từ khóa tìm kiếm xem sao nhé.</p>
-            <a href="{{ route('restaurants.index') }}" class="btn btn-primary btn-sm mt-2">Đặt lại bộ lọc</a>
+        
+        <!-- Footer Card: Phân trang -->
+        @if($restaurants->hasPages())
+        <div class="card-footer bg-white border-top py-3 d-flex justify-content-center">
+            {{ $restaurants->links('pagination::bootstrap-5') }}
         </div>
-        @endforelse
-    </div>
-
-    <!-- PHÂN TRANG -->
-    <div class="d-flex justify-content-center mt-5">
-        {{ $restaurants->withQueryString()->links('pagination::bootstrap-5') }}
+        @endif
     </div>
 </div>
-
-<style>
-    .hover-shadow:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 .5rem 1.5rem rgba(0, 0, 0, .08) !important;
-    }
-
-    .transition-all {
-        transition: all 0.3s ease;
-    }
-
-    .backdrop-blur {
-        backdrop-filter: blur(4px);
-    }
-</style>
 @endsection

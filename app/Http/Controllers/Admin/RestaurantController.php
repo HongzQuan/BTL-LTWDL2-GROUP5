@@ -32,11 +32,13 @@ class RestaurantController extends Controller
             $query->where('status', $request->status);
         }
 
-        $restaurants = $query->orderBy('created_at', 'desc')->paginate(15);
+        $restaurants = Restaurant::paginate(12);
 
-        return view('admin.restaurants.index', compact('restaurants', 'categories'));
-        
+        // Cung cấp 2 biến này sang cho View
+        $cities = Restaurant::select('city')->distinct()->pluck('city')->filter();
+        $categories = Category::all();
 
+        return view('admin.restaurants.index', compact('restaurants', 'cities', 'categories'));
     }
 
     public function create()

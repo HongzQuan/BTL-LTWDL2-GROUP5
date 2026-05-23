@@ -58,7 +58,6 @@ Route::middleware('auth')->group(function () {
 
     // Đánh giá
     Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
-    
 });
 
 // ==========================================
@@ -73,7 +72,9 @@ Route::prefix('admin')
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
         Route::resource('categories', CategoryController::class);
         // Quản lý Nhà hàng
-        Route::resource('restaurants', AdminRestaurantController::class);
+        // Quản lý Nhà hàng (Xóa chữ /admin đi vì đã có prefix bao ngoài)
+        Route::get('/restaurants', [AdminRestaurantController::class, 'index'])->name('restaurants.index');
+        Route::resource('restaurants', \App\Http\Controllers\Admin\RestaurantController::class);
 
         // Quản lý Bàn
         Route::put('tables/{id}/toggle-status', [TableController::class, 'toggleStatus'])->name('tables.toggleStatus');

@@ -1,0 +1,574 @@
+<style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0
+    }
+
+    h2.sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap
+    }
+
+    body {
+        font-family: var(--font-sans);
+        font-size: 14px
+    }
+
+    .top {
+        padding: 1rem 0 0.75rem
+    }
+
+    .filter-bar {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        margin-bottom: 1rem;
+        align-items: center
+    }
+
+    .filter-bar button {
+        font-size: 12px;
+        padding: 4px 12px;
+        border-radius: 20px;
+        border: 0.5px solid var(--color-border-secondary);
+        background: var(--color-background-primary);
+        color: var(--color-text-primary);
+        cursor: pointer
+    }
+
+    .filter-bar button.active {
+        background: #1a6fd4;
+        color: #fff;
+        border-color: #1a6fd4
+    }
+
+    .filter-bar button:hover:not(.active) {
+        background: var(--color-background-secondary)
+    }
+
+    .stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+        margin-bottom: 1rem
+    }
+
+    .stat {
+        background: var(--color-background-secondary);
+        border-radius: 8px;
+        padding: 10px 12px;
+        text-align: center
+    }
+
+    .stat-n {
+        font-size: 20px;
+        font-weight: 500;
+        color: var(--color-text-primary)
+    }
+
+    .stat-l {
+        font-size: 11px;
+        color: var(--color-text-secondary);
+        margin-top: 1px
+    }
+
+    .rh-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 6px
+    }
+
+    .rh {
+        background: var(--color-background-primary);
+        border: 0.5px solid var(--color-border-tertiary);
+        border-radius: 10px;
+        overflow: hidden
+    }
+
+    .rh-head {
+        display: grid;
+        grid-template-columns: 1fr auto auto auto;
+        gap: 8px;
+        align-items: center;
+        padding: 10px 14px;
+        cursor: pointer;
+        user-select: none
+    }
+
+    .rh-head:hover {
+        background: var(--color-background-secondary)
+    }
+
+    .rh-title {
+        font-weight: 500;
+        font-size: 13px;
+        color: var(--color-text-primary)
+    }
+
+    .rh-sub {
+        font-size: 11px;
+        color: var(--color-text-secondary);
+        margin-top: 1px
+    }
+
+    .badge {
+        display: inline-block;
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 20px
+    }
+
+    .b-hn {
+        background: #E6F1FB;
+        color: #0C447C
+    }
+
+    .b-hcm {
+        background: #FAECE7;
+        color: #993C1D
+    }
+
+    .b-dn {
+        background: #E1F5EE;
+        color: #085041
+    }
+
+    .b-ha {
+        background: #FAEEDA;
+        color: #854F0B
+    }
+
+    .cat-b {
+        background: var(--color-background-secondary);
+        color: var(--color-text-secondary);
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 20px
+    }
+
+    .chevron {
+        font-size: 14px;
+        color: var(--color-text-secondary);
+        transition: transform 0.2s
+    }
+
+    .chevron.open {
+        transform: rotate(180deg)
+    }
+
+    .menu-wrap {
+        display: none;
+        border-top: 0.5px solid var(--color-border-tertiary)
+    }
+
+    .menu-wrap.open {
+        display: block
+    }
+
+    .menu-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px
+    }
+
+    .menu-table th {
+        background: var(--color-background-secondary);
+        color: var(--color-text-secondary);
+        font-weight: 500;
+        padding: 7px 14px;
+        text-align: left;
+        white-space: nowrap
+    }
+
+    .menu-table td {
+        padding: 7px 14px;
+        border-top: 0.5px solid var(--color-border-tertiary);
+        color: var(--color-text-primary);
+        vertical-align: middle
+    }
+
+    .menu-table tr:hover td {
+        background: var(--color-background-secondary)
+    }
+
+    .loai-b {
+        font-size: 11px;
+        padding: 2px 7px;
+        border-radius: 20px
+    }
+
+    .l-kv {
+        background: #EEEDFE;
+        color: #3C3489
+    }
+
+    .l-mc {
+        background: #E1F5EE;
+        color: #085041
+    }
+
+    .l-td {
+        background: #FBEAF0;
+        color: #72243E
+    }
+
+    .l-uong {
+        background: #E6F1FB;
+        color: #0C447C
+    }
+
+    .l-phu {
+        background: #FAEEDA;
+        color: #854F0B
+    }
+
+    .avail-on {
+        display: inline-block;
+        width: 28px;
+        height: 16px;
+        border-radius: 10px;
+        background: #1a6fd4;
+        position: relative
+    }
+
+    .avail-on::after {
+        content: '';
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #fff
+    }
+
+    .price {
+        font-weight: 500;
+        color: var(--color-text-primary);
+        white-space: nowrap
+    }
+
+    .count-tag {
+        font-size: 11px;
+        color: var(--color-text-secondary)
+    }
+</style>
+
+<div class="top">
+    <h2 class="sr-only">Danh sách 20 nhà hàng Việt Nam kèm thực đơn theo form Thêm món ăn mới</h2>
+
+    <div class="stats">
+        <div class="stat">
+            <div class="stat-n">20</div>
+            <div class="stat-l">Nhà hàng</div>
+        </div>
+        <div class="stat">
+            <div class="stat-n" id="s-mon">100</div>
+            <div class="stat-l">Món ăn</div>
+        </div>
+        <div class="stat">
+            <div class="stat-n">4</div>
+            <div class="stat-l">Thành phố</div>
+        </div>
+        <div class="stat">
+            <div class="stat-n">8</div>
+            <div class="stat-l">Danh mục</div>
+        </div>
+    </div>
+
+    <div class="filter-bar">
+        <span style="font-size:12px;color:var(--color-text-secondary)">Lọc:</span>
+        <button class="active" onclick="filter('all',this)">Tất cả</button>
+        <button onclick="filter('Hà Nội',this)">Hà Nội</button>
+        <button onclick="filter('TP.HCM',this)">TP.HCM</button>
+        <button onclick="filter('Đà Nẵng',this)">Đà Nẵng</button>
+        <button onclick="filter('Hội An',this)">Hội An</button>
+    </div>
+
+    <div class="rh-wrap" id="list"></div>
+</div>
+
+<script>
+    const cityBadge = {
+        "Hà Nội": "b-hn", "TP.HCM": "b-hcm", "Đà Nẵng": "b-dn", "Hội An": "b-ha"
+    };
+    const loaiCls = {
+        "Khai vị": "l-kv", "Món chính": "l-mc", "Tráng miệng": "l-td", "Đồ uống": "l-uong", "Món phụ": "l-phu"
+    };
+
+    const restaurants = [
+        {
+            id: 1, ten: "Bún Chả Hương Liên", dm: "Phở & Bún & Mì", dc: "24 Lê Văn Hưu", tp: "Hà Nội", sdt: "024 3943 4106", gio: "10:00 – 22:00", min: 80, max: 200,
+            menu: [
+                { mon: "Bún chả đặc biệt", loai: "Món chính", gia: 65000 },
+                { mon: "Bún chả thường", loai: "Món chính", gia: 50000 },
+                { mon: "Nem rán", loai: "Khai vị", gia: 30000 },
+                { mon: "Bún chả cá", loai: "Món chính", gia: 55000 },
+                { mon: "Nước chanh tươi", loai: "Đồ uống", gia: 20000 },
+            ]
+        },
+        {
+            id: 2, ten: "Chả Cá Lã Vọng", dm: "Hải sản", dc: "14 Chả Cá, Hoàn Kiếm", tp: "Hà Nội", sdt: "024 3825 3929", gio: "11:00 – 22:00", min: 150, max: 350,
+            menu: [
+                { mon: "Chả cá đặc biệt (1 người)", loai: "Món chính", gia: 180000 },
+                { mon: "Chả cá đặc biệt (2 người)", loai: "Món chính", gia: 340000 },
+                { mon: "Bún ăn kèm", loai: "Món phụ", gia: 15000 },
+                { mon: "Mắm tôm", loai: "Món phụ", gia: 10000 },
+                { mon: "Bia Hà Nội", loai: "Đồ uống", gia: 25000 },
+            ]
+        },
+        {
+            id: 3, ten: "Quán Ăn Ngon", dm: "Cơm & Cháo", dc: "18 Phan Bội Châu, Hoàn Kiếm", tp: "Hà Nội", sdt: "024 3942 8162", gio: "07:00 – 22:00", min: 100, max: 300,
+            menu: [
+                { mon: "Cơm tấm sườn bì chả", loai: "Món chính", gia: 75000 },
+                { mon: "Bánh cuốn nhân thịt", loai: "Khai vị", gia: 45000 },
+                { mon: "Bánh xèo miền Bắc", loai: "Khai vị", gia: 55000 },
+                { mon: "Chè thập cẩm", loai: "Tráng miệng", gia: 35000 },
+                { mon: "Trà đá", loai: "Đồ uống", gia: 10000 },
+            ]
+        },
+        {
+            id: 4, ten: "La Badiane", dm: "Nhà hàng Âu – Á", dc: "10 Nam Ngư, Hoàn Kiếm", tp: "Hà Nội", sdt: "024 3942 4509", gio: "12:00 – 22:30", min: 300, max: 800,
+            menu: [
+                { mon: "Foie gras áp chảo", loai: "Khai vị", gia: 280000 },
+                { mon: "Bò bít tết sốt nấm", loai: "Món chính", gia: 450000 },
+                { mon: "Cá hồi nướng thảo mộc", loai: "Món chính", gia: 380000 },
+                { mon: "Bánh soufflé sô-cô-la", loai: "Tráng miệng", gia: 150000 },
+                { mon: "Rượu vang đỏ (ly)", loai: "Đồ uống", gia: 220000 },
+            ]
+        },
+        {
+            id: 5, ten: "Cousins Restaurant", dm: "Hải sản", dc: "5 Xuân Diệu, Tây Hồ", tp: "Hà Nội", sdt: "024 3718 0769", gio: "11:00 – 23:00", min: 200, max: 600,
+            menu: [
+                { mon: "Tôm hùm nướng bơ tỏi", loai: "Món chính", gia: 580000 },
+                { mon: "Cua rang muối", loai: "Món chính", gia: 320000 },
+                { mon: "Gỏi tôm bưởi", loai: "Khai vị", gia: 120000 },
+                { mon: "Sò điệp nướng phô mai", loai: "Khai vị", gia: 150000 },
+                { mon: "Kem dừa tươi", loai: "Tráng miệng", gia: 65000 },
+            ]
+        },
+        {
+            id: 6, ten: "Nhà Hàng Ngọc Sương", dm: "Hải sản", dc: "36–38 Lê Anh Xuân, Q.1", tp: "TP.HCM", sdt: "028 3829 7741", gio: "10:30 – 22:30", min: 250, max: 700,
+            menu: [
+                { mon: "Mực nướng sa tế", loai: "Món chính", gia: 220000 },
+                { mon: "Tôm sú hấp bia", loai: "Món chính", gia: 280000 },
+                { mon: "Ghẹ rang me", loai: "Món chính", gia: 350000 },
+                { mon: "Salad hải sản", loai: "Khai vị", gia: 110000 },
+                { mon: "Nước dừa tươi", loai: "Đồ uống", gia: 35000 },
+            ]
+        },
+        {
+            id: 7, ten: "Quán Bình Dân Cô Ba", dm: "Cơm & Cháo", dc: "7/2 Đinh Tiên Hoàng, Bình Thạnh", tp: "TP.HCM", sdt: "028 3840 1234", gio: "08:00 – 21:30", min: 60, max: 180,
+            menu: [
+                { mon: "Cơm sườn nướng", loai: "Món chính", gia: 45000 },
+                { mon: "Cơm bì chả", loai: "Món chính", gia: 40000 },
+                { mon: "Canh chua cá lóc", loai: "Món phụ", gia: 35000 },
+                { mon: "Cháo trắng heo quay", loai: "Món chính", gia: 30000 },
+                { mon: "Trà đá", loai: "Đồ uống", gia: 5000 },
+            ]
+        },
+        {
+            id: 8, ten: "Secret Garden", dm: "Chay & Healthy", dc: "158 Pasteur, Q.3", tp: "TP.HCM", sdt: "028 3822 3888", gio: "11:00 – 22:00", min: 120, max: 350,
+            menu: [
+                { mon: "Bò né chay", loai: "Món chính", gia: 95000 },
+                { mon: "Phở chay đặc biệt", loai: "Món chính", gia: 75000 },
+                { mon: "Cuốn diếp cải chay", loai: "Khai vị", gia: 65000 },
+                { mon: "Sinh tố bơ mật ong", loai: "Đồ uống", gia: 55000 },
+                { mon: "Pudding hạt chia", loai: "Tráng miệng", gia: 60000 },
+            ]
+        },
+        {
+            id: 9, ten: "Pizza 4P's Lê Thánh Tôn", dm: "Nhà hàng Âu – Á", dc: "8 Lê Thánh Tôn, Q.1", tp: "TP.HCM", sdt: "028 3622 0500", gio: "11:00 – 23:00", min: 200, max: 600,
+            menu: [
+                { mon: "Pizza Margherita", loai: "Món chính", gia: 195000 },
+                { mon: "Pizza Burrata & Prosciutto", loai: "Món chính", gia: 295000 },
+                { mon: "Pasta Carbonara", loai: "Món chính", gia: 185000 },
+                { mon: "Tiramisu", loai: "Tráng miệng", gia: 125000 },
+                { mon: "Nước ép cam tươi", loai: "Đồ uống", gia: 75000 },
+            ]
+        },
+        {
+            id: 10, ten: "Cục Gạch Quán", dm: "Cơm & Cháo", dc: "10 Đặng Tất, Q.1", tp: "TP.HCM", sdt: "028 3848 0144", gio: "11:00 – 23:00", min: 150, max: 400,
+            menu: [
+                { mon: "Cơm đất nung cá kho tộ", loai: "Món chính", gia: 120000 },
+                { mon: "Canh khổ qua nhồi thịt", loai: "Món phụ", gia: 65000 },
+                { mon: "Rau muống xào tỏi", loai: "Món phụ", gia: 45000 },
+                { mon: "Chè đậu đen nước dừa", loai: "Tráng miệng", gia: 45000 },
+                { mon: "Nước sâm bí đao", loai: "Đồ uống", gia: 30000 },
+            ]
+        },
+        {
+            id: 11, ten: "Trúc Lâm Viên", dm: "Chay & Healthy", dc: "253 Nguyễn Văn Thoại", tp: "Đà Nẵng", sdt: "0236 3810 880", gio: "09:00 – 21:30", min: 80, max: 200,
+            menu: [
+                { mon: "Cơm chay thập cẩm", loai: "Món chính", gia: 65000 },
+                { mon: "Bún chay Huế", loai: "Món chính", gia: 55000 },
+                { mon: "Chả giò chay", loai: "Khai vị", gia: 40000 },
+                { mon: "Nước ép dưa hấu", loai: "Đồ uống", gia: 30000 },
+                { mon: "Bánh flan chay", loai: "Tráng miệng", gia: 30000 },
+            ]
+        },
+        {
+            id: 12, ten: "Madame Lân", dm: "Phở & Bún & Mì", dc: "4 Bạch Đằng, Hải Châu", tp: "Đà Nẵng", sdt: "0236 3561 936", gio: "10:00 – 22:00", min: 120, max: 400,
+            menu: [
+                { mon: "Mì Quảng tôm thịt", loai: "Món chính", gia: 75000 },
+                { mon: "Bún bò Huế đặc biệt", loai: "Món chính", gia: 80000 },
+                { mon: "Bánh mì thịt nướng", loai: "Khai vị", gia: 35000 },
+                { mon: "Cao lầu Hội An", loai: "Món chính", gia: 70000 },
+                { mon: "Sinh tố dâu tươi", loai: "Đồ uống", gia: 40000 },
+            ]
+        },
+        {
+            id: 13, ten: "Skyview Restaurant", dm: "Nhà hàng Âu – Á", dc: "36 Bạch Đằng, tầng 23", tp: "Đà Nẵng", sdt: "0236 3525 369", gio: "11:30 – 23:00", min: 250, max: 700,
+            menu: [
+                { mon: "Sườn bò nướng rosemary", loai: "Món chính", gia: 380000 },
+                { mon: "Cá hồi sốt chanh butter", loai: "Món chính", gia: 320000 },
+                { mon: "Bruschetta cà chua", loai: "Khai vị", gia: 120000 },
+                { mon: "Lava cake sô-cô-la", loai: "Tráng miệng", gia: 130000 },
+                { mon: "Cocktail Đà Nẵng Sunset", loai: "Đồ uống", gia: 180000 },
+            ]
+        },
+        {
+            id: 14, ten: "Hải Sản Phạm Tươi", dm: "Hải sản", dc: "12 Lê Độ, Sơn Trà", tp: "Đà Nẵng", sdt: "0236 3922 445", gio: "10:00 – 22:00", min: 150, max: 500,
+            menu: [
+                { mon: "Tôm hùm baby nướng", loai: "Món chính", gia: 280000 },
+                { mon: "Ốc hương xào sả ớt", loai: "Món chính", gia: 180000 },
+                { mon: "Bạch tuộc nướng sa tế", loai: "Món chính", gia: 220000 },
+                { mon: "Gỏi ngó sen tôm thịt", loai: "Khai vị", gia: 95000 },
+                { mon: "Bia Larue", loai: "Đồ uống", gia: 20000 },
+            ]
+        },
+        {
+            id: 15, ten: "Bếp Hoa Đà Nẵng", dm: "Cơm & Cháo", dc: "60 Phan Đình Phùng, Hải Châu", tp: "Đà Nẵng", sdt: "0236 3650 777", gio: "07:30 – 22:00", min: 70, max: 220,
+            menu: [
+                { mon: "Cơm gà Hội An", loai: "Món chính", gia: 65000 },
+                { mon: "Cháo cá lóc", loai: "Món chính", gia: 50000 },
+                { mon: "Bánh tráng cuốn thịt heo", loai: "Khai vị", gia: 75000 },
+                { mon: "Chè bắp", loai: "Tráng miệng", gia: 25000 },
+                { mon: "Trà đá Miền Trung", loai: "Đồ uống", gia: 10000 },
+            ]
+        },
+        {
+            id: 16, ten: "The Cargo Club", dm: "Nhà hàng Âu – Á", dc: "107–109 Nguyễn Thái Học", tp: "Hội An", sdt: "0235 3910 489", gio: "09:00 – 23:00", min: 150, max: 500,
+            menu: [
+                { mon: "Bánh mì sandwich thịt nguội", loai: "Khai vị", gia: 95000 },
+                { mon: "Pasta hải sản Hội An", loai: "Món chính", gia: 195000 },
+                { mon: "Bánh crepe dứa", loai: "Tráng miệng", gia: 85000 },
+                { mon: "Café sữa đá", loai: "Đồ uống", gia: 40000 },
+                { mon: "Kem dừa Hội An", loai: "Tráng miệng", gia: 55000 },
+            ]
+        },
+        {
+            id: 17, ten: "Morning Glory", dm: "Phở & Bún & Mì", dc: "106 Nguyễn Thái Học", tp: "Hội An", sdt: "0235 2241 555", gio: "11:00 – 22:00", min: 100, max: 350,
+            menu: [
+                { mon: "Cao lầu đặc biệt", loai: "Món chính", gia: 75000 },
+                { mon: "Mì Quảng gà", loai: "Món chính", gia: 65000 },
+                { mon: "Hoành thánh chiên", loai: "Khai vị", gia: 55000 },
+                { mon: "Bánh bao hấp nhân tôm", loai: "Khai vị", gia: 45000 },
+                { mon: "Sinh tố xoài", loai: "Đồ uống", gia: 45000 },
+            ]
+        },
+        {
+            id: 18, ten: "Mango Mango", dm: "Hải sản", dc: "45 Trần Hưng Đạo", tp: "Hội An", sdt: "0235 3861 839", gio: "10:00 – 22:30", min: 120, max: 400,
+            menu: [
+                { mon: "Cua Hội An rang me", loai: "Món chính", gia: 280000 },
+                { mon: "Tôm rảo nướng than", loai: "Món chính", gia: 175000 },
+                { mon: "Súp hải sản chua cay", loai: "Khai vị", gia: 95000 },
+                { mon: "Nước ép xoài mango", loai: "Đồ uống", gia: 45000 },
+                { mon: "Bánh flan caramel", loai: "Tráng miệng", gia: 50000 },
+            ]
+        },
+        {
+            id: 19, ten: "Streets Restaurant Café", dm: "Chay & Healthy", dc: "17 Lê Lợi, Minh An", tp: "Hội An", sdt: "0235 3914 948", gio: "08:00 – 21:30", min: 80, max: 250,
+            menu: [
+                { mon: "Bánh mì chay nhân rau củ", loai: "Khai vị", gia: 45000 },
+                { mon: "Bún bò chay", loai: "Món chính", gia: 65000 },
+                { mon: "Salad quinoa rau mùa", loai: "Khai vị", gia: 85000 },
+                { mon: "Sinh tố bơ xoài", loai: "Đồ uống", gia: 55000 },
+                { mon: "Bánh chuối nướng", loai: "Tráng miệng", gia: 40000 },
+            ]
+        },
+        {
+            id: 20, ten: "Bale Well", dm: "Lẩu & Nướng BBQ", dc: "45B Trần Hưng Đạo", tp: "Hội An", sdt: "0235 3864 443", gio: "10:00 – 21:00", min: 90, max: 280,
+            menu: [
+                { mon: "Set nướng Hội An (2 người)", loai: "Món chính", gia: 250000 },
+                { mon: "Bánh tráng cuốn thịt nướng", loai: "Khai vị", gia: 85000 },
+                { mon: "Lẩu gà lá giang", loai: "Món chính", gia: 220000 },
+                { mon: "Rau ăn kèm", loai: "Món phụ", gia: 30000 },
+                { mon: "Bia Tiger", loai: "Đồ uống", gia: 25000 },
+            ]
+        },
+    ];
+
+    let openId = null;
+    let currentCity = 'all';
+
+    function totalMon() {
+        return restaurants.reduce((a, r) => a + r.menu.length, 0);
+    }
+    document.getElementById('s-mon').textContent = totalMon();
+
+    function render(list) {
+        const el = document.getElementById('list');
+        el.innerHTML = '';
+        list.forEach(r => {
+            const div = document.createElement('div');
+            div.className = 'rh';
+            div.innerHTML = `
+      <div class="rh-head" onclick="toggle(${r.id})">
+        <div>
+          <div class="rh-title"><i class="ti ti-building-store" style="font-size:13px;margin-right:5px;vertical-align:-1px" aria-hidden="true"></i>${r.ten}</div>
+          <div class="rh-sub">${r.dc} &middot; ${r.gio} &middot; ${r.min.toLocaleString()}–${r.max.toLocaleString()}đ</div>
+        </div>
+        <span class="badge ${cityBadge[r.tp]}">${r.tp}</span>
+        <span class="cat-b">${r.dm}</span>
+        <i class="ti ti-chevron-down chevron ${openId === r.id ? 'open' : ''}" id="ch-${r.id}" aria-hidden="true"></i>
+      </div>
+      <div class="menu-wrap ${openId === r.id ? 'open' : ''}" id="mw-${r.id}">
+        <table class="menu-table">
+          <thead><tr>
+            <th style="width:5%">#</th>
+            <th style="width:35%">Tên món</th>
+            <th style="width:20%">Loại món</th>
+            <th style="width:20%">Giá (VNĐ)</th>
+            <th style="width:20%">Cho đặt món</th>
+          </tr></thead>
+          <tbody>
+            ${r.menu.map((m, i) => `
+              <tr>
+                <td style="color:var(--color-text-secondary);text-align:center">${i + 1}</td>
+                <td style="font-weight:500">${m.mon}</td>
+                <td><span class="loai-b ${loaiCls[m.loai] || 'l-mc'}">${m.loai}</span></td>
+                <td class="price">${m.gia.toLocaleString()}đ</td>
+                <td><span class="avail-on" aria-label="Còn phục vụ"></span></td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+            el.appendChild(div);
+        });
+    }
+
+    function toggle(id) {
+        openId = openId === id ? null : id;
+        const filtered = currentCity === 'all' ? restaurants : restaurants.filter(r => r.tp === currentCity);
+        render(filtered);
+    }
+
+    function filter(city, btn) {
+        document.querySelectorAll('.filter-bar button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentCity = city;
+        openId = null;
+        const filtered = city === 'all' ? restaurants : restaurants.filter(r => r.tp === city);
+        render(filtered);
+    }
+
+    render(restaurants);
+</script>

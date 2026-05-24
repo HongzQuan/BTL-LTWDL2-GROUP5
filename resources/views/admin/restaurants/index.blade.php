@@ -15,10 +15,10 @@
 
     <!-- Thông báo Success -->
     @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show shadow-sm border-0" role="alert">
-            <strong class="me-1">Thành công!</strong> {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
+    <div class="alert alert-success alert-dismissible fade show shadow-sm border-0" role="alert">
+        <strong class="me-1">Thành công!</strong> {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
     @endif
 
     <!-- Card Bảng dữ liệu -->
@@ -41,10 +41,10 @@
                         <tr>
                             <td class="ps-4 text-center fw-semibold text-muted">#{{ $restaurant->id }}</td>
                             <td>
-                                <img src="{{ $restaurant->image_url ?? 'https://placehold.co/100x75?text=No+Image' }}" 
-                                     alt="{{ $restaurant->name }}" 
-                                     class="rounded shadow-sm object-fit-cover" 
-                                     style="width: 90px; height: 65px;">
+                                <img src="{{ $restaurant->image ? asset('storage/' . $restaurant->image) : 'https://placehold.co/100x75?text=No+Image' }}"
+                                    alt="{{ $restaurant->name }}"
+                                    class="rounded shadow-sm object-fit-cover"
+                                    style="width: 90px; height: 65px;">
                             </td>
                             <td>
                                 <p class="fw-bold text-dark mb-1">{{ $restaurant->name }}</p>
@@ -55,7 +55,7 @@
                             <td>
                                 <p class="mb-1 small fw-semibold">📍 {{ $restaurant->city }}</p>
                                 @if($restaurant->district)
-                                    <p class="mb-0 text-muted small">{{ $restaurant->district }}</p>
+                                <p class="mb-0 text-muted small">{{ $restaurant->district }}</p>
                                 @endif
                             </td>
                             <td>
@@ -66,15 +66,15 @@
                             <td class="text-end pe-4">
                                 <div class="btn-group" role="group">
                                     <!-- Nút Sửa -->
-                                    <a href="{{ route('admin.restaurants.edit', $restaurant->id) }}" 
-                                       class="btn btn-sm btn-outline-primary" title="Chỉnh sửa">
+                                    <a href="{{ route('admin.restaurants.edit', $restaurant->id) }}"
+                                        class="btn btn-sm btn-outline-primary" title="Chỉnh sửa">
                                         Sửa
                                     </a>
                                     <!-- Nút Xóa (Dùng Form vì Route Destroy bắt buộc method DELETE) -->
-                                    <form action="{{ route('admin.restaurants.destroy', $restaurant->id) }}" 
-                                          method="POST" 
-                                          class="d-inline-block m-0" 
-                                          onsubmit="return confirm('Bạn có chắc chắn muốn xóa nhà hàng [{{ $restaurant->name }}] không? Hành động này không thể hoàn tác!');">
+                                    <form action="{{ route('admin.restaurants.destroy', $restaurant->id) }}"
+                                        method="POST"
+                                        class="d-inline-block m-0"
+                                        onsubmit="return confirm('Bạn có chắc chắn muốn xóa nhà hàng [{{ $restaurant->name }}] không? Hành động này không thể hoàn tác!');">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-sm btn-outline-danger" title="Xóa">
@@ -97,7 +97,7 @@
                 </table>
             </div>
         </div>
-        
+
         <!-- Footer Card: Phân trang -->
         @if($restaurants->hasPages())
         <div class="card-footer bg-white border-top py-3 d-flex justify-content-center">

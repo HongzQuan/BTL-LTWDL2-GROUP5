@@ -60,7 +60,7 @@ class Restaurant extends Model
 
     public function menuItems(): HasMany
     {
-        return $this->hasMany(MenuItem::class);
+        return $this->hasMany(MenuItem::class, 'restaurant_id', 'id');
     }
 
     public function bookings(): HasMany
@@ -70,6 +70,6 @@ class Restaurant extends Model
 
     public function reviews(): HasMany
     {
-        return $this->hasMany(Review::class);
+        return $this->hasMany(Review::class, 'restaurant_id', 'id');
     }
 }

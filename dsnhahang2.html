@@ -1,0 +1,305 @@
+<style>
+    h2.sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0
+    }
+
+    body {
+        font-family: var(--font-sans)
+    }
+
+    .wrap {
+        padding: 1rem 0
+    }
+
+    .filter-bar {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-bottom: 1.25rem;
+        align-items: center
+    }
+
+    .filter-bar button {
+        font-size: 13px;
+        padding: 5px 14px;
+        border-radius: 20px;
+        border: 0.5px solid var(--color-border-secondary);
+        background: var(--color-background-primary);
+        color: var(--color-text-primary);
+        cursor: pointer;
+        transition: background 0.15s
+    }
+
+    .filter-bar button.active {
+        background: var(--color-background-info);
+        color: var(--color-text-info);
+        border-color: transparent
+    }
+
+    .filter-bar button:hover:not(.active) {
+        background: var(--color-background-secondary)
+    }
+
+    .stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        margin-bottom: 1.25rem
+    }
+
+    .stat {
+        background: var(--color-background-secondary);
+        border-radius: var(--border-radius-md);
+        padding: 12px 14px;
+        text-align: center
+    }
+
+    .stat-num {
+        font-size: 22px;
+        font-weight: 500;
+        color: var(--color-text-primary)
+    }
+
+    .stat-lbl {
+        font-size: 12px;
+        color: var(--color-text-secondary);
+        margin-top: 2px
+    }
+
+    .table-wrap {
+        overflow-x: auto
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+        table-layout: fixed
+    }
+
+    th {
+        background: var(--color-background-secondary);
+        color: var(--color-text-secondary);
+        font-weight: 500;
+        padding: 9px 10px;
+        text-align: left;
+        border-bottom: 0.5px solid var(--color-border-tertiary);
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        white-space: nowrap
+    }
+
+    td {
+        padding: 9px 10px;
+        border-bottom: 0.5px solid var(--color-border-tertiary);
+        color: var(--color-text-primary);
+        vertical-align: middle;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis
+    }
+
+    tr:last-child td {
+        border-bottom: none
+    }
+
+    tr:hover td {
+        background: var(--color-background-secondary)
+    }
+
+    .badge {
+        display: inline-block;
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 20px;
+        font-weight: 500
+    }
+
+    .badge-hn {
+        background: #E6F1FB;
+        color: #0C447C
+    }
+
+    .badge-hcm {
+        background: #FAECE7;
+        color: #993C1D
+    }
+
+    .badge-dn {
+        background: #E1F5EE;
+        color: #085041
+    }
+
+    .badge-ha {
+        background: #FAEEDA;
+        color: #854F0B
+    }
+
+    .cat-badge {
+        display: inline-block;
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 20px;
+        background: var(--color-background-secondary);
+        color: var(--color-text-secondary)
+    }
+
+    th:nth-child(1) {
+        width: 5%
+    }
+
+    th:nth-child(2) {
+        width: 20%
+    }
+
+    th:nth-child(3) {
+        width: 13%
+    }
+
+    th:nth-child(4) {
+        width: 16%
+    }
+
+    th:nth-child(5) {
+        width: 11%
+    }
+
+    th:nth-child(6) {
+        width: 12%
+    }
+
+    th:nth-child(7) {
+        width: 11%
+    }
+
+    th:nth-child(8) {
+        width: 12%
+    }
+</style>
+<div class="wrap">
+    <h2 class="sr-only">Danh sách 20 nhà hàng tại Việt Nam gồm Hà Nội, TP.HCM, Đà Nẵng và Hội An</h2>
+
+    <div class="stats" id="stats">
+        <div class="stat">
+            <div class="stat-num" id="s-total">20</div>
+            <div class="stat-lbl">Tổng nhà hàng</div>
+        </div>
+        <div class="stat">
+            <div class="stat-num">4</div>
+            <div class="stat-lbl">Thành phố</div>
+        </div>
+        <div class="stat">
+            <div class="stat-num">6</div>
+            <div class="stat-lbl">Danh mục</div>
+        </div>
+        <div class="stat">
+            <div class="stat-num" id="s-avg">—</div>
+            <div class="stat-lbl">Giá TB (nghìn đ)</div>
+        </div>
+    </div>
+
+    <div class="filter-bar">
+        <span style="font-size:13px;color:var(--color-text-secondary)">Lọc:</span>
+        <button class="active" onclick="filter('all',this)">Tất cả</button>
+        <button onclick="filter('Hà Nội',this)">Hà Nội</button>
+        <button onclick="filter('TP.HCM',this)">TP.HCM</button>
+        <button onclick="filter('Đà Nẵng',this)">Đà Nẵng</button>
+        <button onclick="filter('Hội An',this)">Hội An</button>
+    </div>
+
+    <div class="table-wrap">
+        <table id="tbl">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Tên nhà hàng</th>
+                    <th>Danh mục</th>
+                    <th>Địa chỉ chi tiết</th>
+                    <th>Thành phố</th>
+                    <th>Số điện thoại</th>
+                    <th>Giờ mở – đóng</th>
+                    <th>Giá (nghìn đ)</th>
+                </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const data = [
+        { ten: "Bún Chả Hương Liên", dm: "Ẩm thực Việt", dc: "24 Lê Văn Hưu", tp: "Hà Nội", sdt: "024 3943 4106", mo: "10:00 AM", dong: "10:00 PM", min: 80, max: 200 },
+        { ten: "Chả Cá Lã Vọng", dm: "Ẩm thực Việt", dc: "14 Chả Cá, Hoàn Kiếm", tp: "Hà Nội", sdt: "024 3825 3929", mo: "11:00 AM", dong: "10:00 PM", min: 150, max: 350 },
+        { ten: "Nhà Hàng Quán Ăn Ngon", dm: "Ẩm thực Việt", dc: "18 Phan Bội Châu, Hoàn Kiếm", tp: "Hà Nội", sdt: "024 3942 8162", mo: "07:00 AM", dong: "10:00 PM", min: 100, max: 300 },
+        { ten: "La Badiane", dm: "Âu – Fusion", dc: "10 Nam Ngư, Hoàn Kiếm", tp: "Hà Nội", sdt: "024 3942 4509", mo: "12:00 PM", dong: "10:30 PM", min: 300, max: 800 },
+        { ten: "Cousins Restaurant", dm: "Hải sản", dc: "5 Xuân Diệu, Tây Hồ", tp: "Hà Nội", sdt: "024 3718 0769", mo: "11:00 AM", dong: "11:00 PM", min: 200, max: 600 },
+        { ten: "Nhà Hàng Ngọc Sương", dm: "Hải sản", dc: "36–38 Lê Anh Xuân, Q.1", tp: "TP.HCM", sdt: "028 3829 7741", mo: "10:30 AM", dong: "10:30 PM", min: 250, max: 700 },
+        { ten: "Quán Bình Dân Cô Ba", dm: "Ẩm thực Việt", dc: "7/2 Đinh Tiên Hoàng, Bình Thạnh", tp: "TP.HCM", sdt: "028 3840 1234", mo: "08:00 AM", dong: "09:30 PM", min: 60, max: 180 },
+        { ten: "Secret Garden", dm: "Chay – Healthy", dc: "158 Pasteur, Q.3", tp: "TP.HCM", sdt: "028 3822 3888", mo: "11:00 AM", dong: "10:00 PM", min: 120, max: 350 },
+        { ten: "Pizza 4P's Lê Thánh Tôn", dm: "Âu – Fusion", dc: "8 Lê Thánh Tôn, Q.1", tp: "TP.HCM", sdt: "028 3622 0500", mo: "11:00 AM", dong: "11:00 PM", min: 200, max: 600 },
+        { ten: "Cục Gạch Quán", dm: "Ẩm thực Việt", dc: "10 Đặng Tất, Q.1", tp: "TP.HCM", sdt: "028 3848 0144", mo: "11:00 AM", dong: "11:00 PM", min: 150, max: 400 },
+        { ten: "Nhà Hàng Trúc Lâm Viên", dm: "Chay – Healthy", dc: "253 Nguyễn Văn Thoại", tp: "Đà Nẵng", sdt: "0236 3810 880", mo: "09:00 AM", dong: "09:30 PM", min: 80, max: 200 },
+        { ten: "Madame Lân", dm: "Ẩm thực Việt", dc: "4 Bạch Đằng, Hải Châu", tp: "Đà Nẵng", sdt: "0236 3561 936", mo: "10:00 AM", dong: "10:00 PM", min: 120, max: 400 },
+        { ten: "Nhà Hàng Skyview", dm: "Âu – Fusion", dc: "36 Bạch Đằng, tầng 23", tp: "Đà Nẵng", sdt: "0236 3525 369", mo: "11:30 AM", dong: "11:00 PM", min: 250, max: 700 },
+        { ten: "Hải Sản Phạm Tươi", dm: "Hải sản", dc: "12 Lê Độ, Sơn Trà", tp: "Đà Nẵng", sdt: "0236 3922 445", mo: "10:00 AM", dong: "10:00 PM", min: 150, max: 500 },
+        { ten: "Bếp Hoa Đà Nẵng", dm: "Ẩm thực Việt", dc: "60 Phan Đình Phùng, Hải Châu", tp: "Đà Nẵng", sdt: "0236 3650 777", mo: "07:30 AM", dong: "10:00 PM", min: 70, max: 220 },
+        { ten: "The Cargo Club", dm: "Âu – Fusion", dc: "107–109 Nguyễn Thái Học", tp: "Hội An", sdt: "0235 3910 489", mo: "09:00 AM", dong: "11:00 PM", min: 150, max: 500 },
+        { ten: "Morning Glory Restaurant", dm: "Ẩm thực Việt", dc: "106 Nguyễn Thái Học", tp: "Hội An", sdt: "0235 2241 555", mo: "11:00 AM", dong: "10:00 PM", min: 100, max: 350 },
+        { ten: "Mango Mango", dm: "Hải sản", dc: "45 Trần Hưng Đạo", tp: "Hội An", sdt: "0235 3861 839", mo: "10:00 AM", dong: "10:30 PM", min: 120, max: 400 },
+        { ten: "Streets Restaurant Café", dm: "Chay – Healthy", dc: "17 Lê Lợi, Minh An", tp: "Hội An", sdt: "0235 3914 948", mo: "08:00 AM", dong: "09:30 PM", min: 80, max: 250 },
+        { ten: "Bale Well", dm: "Ẩm thực Việt", dc: "45B Trần Hưng Đạo", tp: "Hội An", sdt: "0235 3864 443", mo: "10:00 AM", dong: "09:00 PM", min: 90, max: 280 },
+    ];
+
+    const cityBadge = {
+        "Hà Nội": "badge-hn",
+        "TP.HCM": "badge-hcm",
+        "Đà Nẵng": "badge-dn",
+        "Hội An": "badge-ha"
+    };
+
+    function render(rows) {
+        const tb = document.getElementById('tbody');
+        tb.innerHTML = '';
+        let tot = 0, cnt = 0;
+        rows.forEach((r, i) => {
+            tot += Math.round((r.min + r.max) / 2); cnt++;
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+      <td style="color:var(--color-text-secondary);text-align:center">${i + 1}</td>
+      <td style="font-weight:500;white-space:normal;overflow:visible">${r.ten}</td>
+      <td><span class="cat-badge">${r.dm}</span></td>
+      <td style="white-space:normal;overflow:visible;font-size:12px;color:var(--color-text-secondary)">${r.dc}</td>
+      <td><span class="badge ${cityBadge[r.tp]}">${r.tp}</span></td>
+      <td style="font-size:12px">${r.sdt}</td>
+      <td style="font-size:12px">${r.mo} – ${r.dong}</td>
+      <td style="font-size:12px">${r.min.toLocaleString()} – ${r.max.toLocaleString()}</td>
+    `;
+            tb.appendChild(tr);
+        });
+        document.getElementById('s-total').textContent = cnt;
+        document.getElementById('s-avg').textContent = cnt ? Math.round(tot / cnt).toLocaleString() : '—';
+    }
+
+    function filter(city, btn) {
+        document.querySelectorAll('.filter-bar button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const rows = city === 'all' ? data : data.filter(r => r.tp === city);
+        render(rows);
+    }
+
+    render(data);
+</script>

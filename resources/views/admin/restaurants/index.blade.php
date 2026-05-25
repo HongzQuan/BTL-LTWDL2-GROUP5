@@ -6,7 +6,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h2 class="fw-bold text-dark m-0">Quản lý Nhà hàng</h2>
-            <p class="text-muted mb-0 mt-1">Danh sách tất cả các nhà hàng đang hoạt động trên hệ thống</p>
+            <p class="text-muted mb-0 mt-1">Danh sách tất cả các nhà hàng đang hoạt động </p>
         </div>
         <a href="{{ route('admin.restaurants.create') }}" class="btn btn-primary fw-bold shadow-sm px-4">
             + Thêm nhà hàng mới
@@ -42,13 +42,13 @@
                             <td class="ps-4 text-center fw-semibold text-muted">#{{ $restaurant->id }}</td>
                             <td>
                                 <img src="{{ $restaurant->image ? asset('storage/' . $restaurant->image) : 'https://placehold.co/100x75?text=No+Image' }}"
-                                    alt="{{ $restaurant->name }}"
-                                    class="rounded shadow-sm object-fit-cover"
+                                    alt="{{ $restaurant->name }}" class="rounded shadow-sm object-fit-cover"
                                     style="width: 90px; height: 65px;">
                             </td>
                             <td>
                                 <p class="fw-bold text-dark mb-1">{{ $restaurant->name }}</p>
-                                <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25">
+                                <span
+                                    class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-25">
                                     {{ $restaurant->category->name ?? 'Chưa phân loại' }}
                                 </span>
                             </td>
@@ -59,7 +59,8 @@
                                 @endif
                             </td>
                             <td>
-                                <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-2 py-1">
+                                <span
+                                    class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-2 py-1">
                                     Đang hoạt động
                                 </span>
                             </td>
@@ -72,8 +73,7 @@
                                     </a>
                                     <!-- Nút Xóa (Dùng Form vì Route Destroy bắt buộc method DELETE) -->
                                     <form action="{{ route('admin.restaurants.destroy', $restaurant->id) }}"
-                                        method="POST"
-                                        class="d-inline-block m-0"
+                                        method="POST" class="d-inline-block m-0"
                                         onsubmit="return confirm('Bạn có chắc chắn muốn xóa nhà hàng [{{ $restaurant->name }}] không? Hành động này không thể hoàn tác!');">
                                         @csrf
                                         @method('DELETE')

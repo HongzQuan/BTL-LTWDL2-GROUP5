@@ -57,7 +57,7 @@
                     {{-- Nhà hàng --}}
                     <div class="d-flex gap-3 align-items-start mb-4 pb-4 border-bottom">
                         @if($booking->restaurant->image)
-                        <img src="{{ asset('storage/' . $booking->restaurant->image) }}"
+                        <img src="{{ asset($booking->restaurant->image) }}"
                             alt="{{ $booking->restaurant->name }}"
                             class="rounded-3 flex-shrink-0"
                             style="width:80px; height:80px; object-fit:cover;">

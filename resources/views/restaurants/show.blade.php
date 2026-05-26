@@ -7,18 +7,17 @@
     <div class="row g-2 mb-4">
         <!-- Cột trái: Ảnh chính to -->
         <div class="col-md-8">
-            <div class="position-relative h-100">
-                <img src="{{ $restaurant->image ? asset('storage/' . $restaurant->image) : 'https://placehold.co/800x500?text=Anh+Chinh' }}"
-                    class="w-100 h-100 object-fit-cover rounded-start shadow-sm"
-                    style="max-height: 420px; min-height: 420px;"
-                    alt="{{ $restaurant->name }}">
+            <div class="position-relative w-100" style="aspect-ratio: 16/9; overflow: hidden; border-radius: 0.5rem;">
+                <img src="{{ $restaurant->image ? asset($restaurant->image) : 'https://placehold.co/800x500?text=No+Image' }}"
+                    class="w-100 h-100 object-fit-cover rounded-start shadow-sm" alt="{{ $restaurant->name }}">
             </div>
         </div>
         <!-- Cột phải: Lưới 4 ảnh nhỏ -->
         <div class="col-md-4 d-none d-md-block">
             <div class="row g-2">
                 <div class="col-6">
-                    <img src="{{ $restaurant->image ? asset('storage/' . $restaurant->image) : 'https://placehold.co/300x300?text=No+Image' }}" class="w-100 object-fit-cover rounded" style="height: 150px; opacity: 0.9;" alt="Không gian 1">
+                    <img src="{{ $restaurant->image ? asset($restaurant->image) : 'https://placehold.co/300x300?text=No+Image' }}"
+                        class="w-100 object-fit-cover rounded" style="height: 150px; opacity: 0.9;" alt="Không gian 1">
                 </div>
                 <div class="col-6">
                     <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" class="w-100 object-fit-cover rounded" style="height: 150px;" alt="Không gian 2">
@@ -288,35 +287,19 @@
             @forelse($similarRestaurants ?? [] as $similar)
             <div class="col">
                 <a href="{{ route('restaurants.show', $similar->id) }}" class="text-decoration-none">
-                    <div class="card h-100 border-0 shadow-sm hover-card-similar transition-all rounded-4 overflow-hidden bg-white">
-
-                        <div class="position-relative w-100 bg-light" style="aspect-ratio: 4/3;">
-                            <img src="{{ $similar->image ? asset('storage/' . $similar->image) : 'https://placehold.co/400x300?text=No+Image' }}"
+                    <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden d-flex flex-column">
+                        <div class="position-relative w-100" style="aspect-ratio: 4/3;">
+                            <img src="{{ $similar->image ? asset($similar->image) : 'https://placehold.co/400x300?text=No+Image' }}"
                                 class="w-100 h-100 object-fit-cover" alt="{{ $similar->name }}">
-
-                            <span class="position-absolute top-0 start-0 m-2 px-2 py-1 bg-dark bg-opacity-75 text-white fw-semibold rounded-2 shadow-sm" style="font-size: 0.75rem;">
-                                {{ $similar->category->name ?? 'Nhà hàng' }}
-                            </span>
                         </div>
 
                         <div class="card-body p-3 d-flex flex-column">
-                            <h6 class="fw-bold mb-2 text-dark text-truncate" title="{{ $similar->name }}">
-                                {{ $similar->name }}
-                            </h6>
+                            <h6 class="fw-bold mb-2 text-truncate">{{ $similar->name }}</h6>
+                            <p class="text-muted small mb-0"><i class="bi bi-geo-alt-fill"></i> {{ $similar->city }}</p>
 
-                            <div class="mb-2">
-                                <span class="text-muted small"><i class="bi bi-geo-alt-fill text-danger me-1"></i>{{ $similar->city }}</span>
-                            </div>
-
-                            <div class="mt-auto pt-3 border-top d-flex justify-content-between align-items-center">
-                                <span class="text-warning fw-bold small">
-                                    <i class="bi bi-star-fill"></i>
-                                    {{ $similar->average_rating ? round($similar->average_rating, 1) : '5.0' }}
-                                </span>
-
-                                <span class="text-danger small fw-bold">
-                                    Chi tiết <i class="bi bi-arrow-right-short"></i>
-                                </span>
+                            <div class="mt-auto pt-3 d-flex justify-content-between align-items-center">
+                                <span class="text-warning fw-bold small"><i class="bi bi-star-fill"></i> 5.0</span>
+                                <span class="text-danger small fw-bold">Chi tiết <i class="bi bi-arrow-right"></i></span>
                             </div>
                         </div>
                     </div>

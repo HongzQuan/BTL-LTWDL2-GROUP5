@@ -73,7 +73,7 @@
                         HOT 🔥
                     </span>
 
-                    <img src="{{ $restaurant->image ? asset('storage/' . $restaurant->image) : 'https://placehold.co/400x300?text=No+Image' }}"
+                    <img src="{{ $restaurant->image ? asset($restaurant->image) : 'https://placehold.co/400x300?text=No+Image' }}"
                         class="w-100 h-100 object-fit-cover" alt="{{ $restaurant->name }}">
                 </div>
 
@@ -169,7 +169,7 @@
                         <!-- Badge MỚI ôm sát góc ảnh -->
                         <span class="position-absolute top-0 start-0 bg-success text-white px-2 py-1 fw-bold shadow-sm" style="border-bottom-right-radius: 8px; font-size: 0.7rem; z-index: 2;">MỚI</span>
 
-                        <img src="{{ $restaurant->image ? asset('storage/' . $restaurant->image) : 'https://placehold.co/200x200?text=New' }}"
+                        <img src="{{ $restaurant->image ? asset($restaurant->image) : 'https://placehold.co/200x200?text=New' }}"
                             class="img-fluid h-100 w-100 object-fit-cover rounded-start" alt="{{ $restaurant->name }}">
                     </div>
                     <div class="col-8">

@@ -63,8 +63,16 @@ class RestaurantController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('restaurants', 'public');
-            // Nếu bạn dùng accessor $restaurant->image_url ở view thì lưu path vào DB
+            $file = $request->file('image');
+
+            // Tạo tên file độc nhất để không bị trùng (ví dụ: 1716728400_bun-cha.jpg)
+            $filename = time() . '_' . $file->getClientOriginalName();
+
+            // Di chuyển file ảnh THẲNG vào thư mục public/uploads/restaurants/
+            $file->move(public_path('uploads/restaurants'), $filename);
+
+            // Lưu đường dẫn này vào Database: "uploads/restaurants/tên_file.jpg"
+            $restaurant->image = 'uploads/restaurants/' . $filename;
         }
 
         $validated['status'] = 1; // Mặc định active khi mới tạo

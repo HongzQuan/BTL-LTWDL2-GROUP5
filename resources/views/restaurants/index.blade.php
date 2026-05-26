@@ -74,7 +74,7 @@
         <div class="col">
             <div class="card h-100 border-0 shadow-sm hover-shadow transition-all position-relative">
                 <div class="position-relative overflow-hidden rounded-top" style="aspect-ratio: 4/3;">
-                    <img src="{{ $restaurant->image ? asset('storage/' . $restaurant->image) : 'https://placehold.co/600x450?text=No+Image' }}" class="w-100 h-100 object-fit-cover" alt="{{ $restaurant->name }}">
+                    <img src="{{ $restaurant->image ? asset($restaurant->image) : 'https://placehold.co/600x450?text=No+Image' }}" class="w-100 h-100 object-fit-cover" alt="{{ $restaurant->name }}">
                     <span class="position-absolute top-0 start-0 m-3 badge bg-dark bg-opacity-75 backdrop-blur py-2 px-3 fs-7">{{ $restaurant->category->name }}</span>
                 </div>
                 <div class="card-body d-flex flex-column p-4">

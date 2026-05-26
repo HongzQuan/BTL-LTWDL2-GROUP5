@@ -97,7 +97,8 @@
                             class="text-decoration-none text-dark link-primary">{{ $restaurant->name }}</a>
                     </h5>
                     <p class="card-text text-muted small mb-3 text-truncate">📍 {{ $restaurant->address }},
-                        {{ $restaurant->district }}, {{ $restaurant->city }}</p>
+                        {{ $restaurant->district }}, {{ $restaurant->city }}
+                    </p>
                     <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top border-light">
                         <div>
                             <span class="text-warning fw-bold">★</span>
@@ -105,7 +106,8 @@
                         </div>
                         <div class="small text-muted">🕒
                             {{ \Carbon\Carbon::parse($restaurant->open_time)->format('H:i') }} -
-                            {{ \Carbon\Carbon::parse($restaurant->close_time)->format('H:i') }}</div>
+                            {{ \Carbon\Carbon::parse($restaurant->close_time)->format('H:i') }}
+                        </div>
                     </div>
                     <div class="mt-3">
                         <a href="{{ route('restaurants.show', $restaurant->id) }}"
@@ -140,19 +142,42 @@
         {{ $restaurants->withQueryString()->links('pagination::bootstrap-5') }}
     </div>
 </div>
-
 <style>
+.hover-shadow {
+    border-radius: 18px;
+    overflow: hidden;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
 .hover-shadow:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 .5rem 1.5rem rgba(0, 0, 0, .08) !important;
+    transform: translateY(-8px) scale(1.01);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12) !important;
 }
 
 .transition-all {
-    transition: all 0.3s ease;
+    transition: all 0.25s linear;
 }
 
 .backdrop-blur {
-    backdrop-filter: blur(4px);
+    backdrop-filter: blur(8px);
+    background: rgba(0, 0, 0, 0.45) !important;
+}
+
+.card img {
+    transition: transform 0.4s ease;
+}
+
+.card:hover img {
+    transform: scale(1.06);
+}
+
+.btn-primary {
+    border-radius: 12px;
+    font-weight: 600;
+}
+
+.badge {
+    letter-spacing: 0.5px;
 }
 </style>
 @endsection

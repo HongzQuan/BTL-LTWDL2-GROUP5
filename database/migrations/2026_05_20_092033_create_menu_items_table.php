@@ -15,7 +15,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->decimal('price', 10, 2);
             $table->string('image')->nullable();
-            $table->enum('type', ['khai_vi', 'mon_chinh', 'trang_mieng', 'do_uong']);
+            $table->enum('type', ['khai_vi', 'mon_chinh', 'buffet', 'trang_mieng', 'do_uong']);
             $table->boolean('is_available')->default(1);
             $table->timestamps();
         });

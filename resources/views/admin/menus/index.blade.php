@@ -7,6 +7,7 @@
 $typeLabels = [
 'khai_vi' => 'Khai vị',
 'mon_chinh' => 'Món chính',
+'buffet' => 'Buffet',
 'trang_mieng' => 'Tráng miệng',
 'do_uong' => 'Đồ uống'
 ];
@@ -217,6 +218,7 @@ $typeLabels = [
                                     @switch($item->type)
                                         @case('khai_vi')     bg-success  @break
                                         @case('mon_chinh')   bg-danger   @break
+                                        @case('buffet')      bg-success-subtle text-success @break
                                         @case('trang_mieng') bg-warning text-dark @break
                                         @case('do_uong')     bg-info     @break
                                         @default             bg-secondary

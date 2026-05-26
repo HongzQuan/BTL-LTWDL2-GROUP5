@@ -1,5 +1,4 @@
 <?php
-// app/Http/Controllers/Admin/MenuController.php
 
 namespace App\Http\Controllers\Admin;
 
@@ -13,7 +12,7 @@ use Illuminate\Validation\Rule;
 class MenuController extends Controller
 {
     // Các loại món (đồng bộ với ENUM/giá trị trong DB)
-    private const MENU_TYPES = ['khai_vi', 'mon_chinh', 'trang_mieng', 'do_uong'];
+    private const MENU_TYPES = ['khai_vi', 'mon_chinh', 'buffet', 'trang_mieng', 'do_uong'];
 
     // ─────────────────────────────────────────────────────────────────────
     // INDEX

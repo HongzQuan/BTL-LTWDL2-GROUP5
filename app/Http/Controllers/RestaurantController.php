@@ -40,8 +40,14 @@ class RestaurantController extends Controller
         if ($request->filled('q')) {
             $q = $request->q;
             $query->where(function ($subQuery) use ($q) {
+                // 1. Tìm trong tên nhà hàng
                 $subQuery->where('name', 'like', "%{$q}%")
-                    ->orWhere('address', 'like', "%{$q}%");
+                    // 2. Tìm trong địa chỉ
+                    ->orWhere('address', 'like', "%{$q}%")
+                    // 3. MỚI: Tìm luôn trong Tên danh mục (Category)
+                    ->orWhereHas('category', function ($catQuery) use ($q) {
+                        $catQuery->where('name', 'like', "%{$q}%");
+                    });
             });
         }
 

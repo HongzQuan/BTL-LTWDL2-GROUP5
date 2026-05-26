@@ -11,8 +11,9 @@
         body {
             background-color: #f8f9fa;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            scroll-behavior: smooth;    
+            scroll-behavior: smooth;
         }
+
         .text-danger-pasgo {
             color: #dc3545 !important;
         }
@@ -79,12 +80,14 @@
                             <li><a class="dropdown-item" href="{{ route('profile') }}"><i class="bi bi-person me-2"></i>Hồ sơ cá nhân</a></li>
                             <li><a class="dropdown-item" href="{{ route('profile') }}"><i class="bi bi-calendar-check me-2"></i>Lịch sử đặt bàn</a></li>
                             <li>
-                                <form action="/logout" method="POST">
+                                <form action="{{ route('logout') }}" method="POST">
                                     @csrf
-                                    <button type="submit" class="dropdown-item text-danger"><i class="bi bi-box-arrow-right me-2"></i>Đăng xuất</button>
+                                    <button type="submit" class="dropdown-item text-danger">
+                                        <i class="bi bi-box-arrow-right me-2"></i>Đăng xuất
+                                    </button>
                                 </form>
                             </li>
-                            
+
                         </ul>
                     </div>
                     @endguest

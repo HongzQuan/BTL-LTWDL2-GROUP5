@@ -212,7 +212,7 @@
                         <div class="col-lg-6">
                             <h5 class="fw-bold mb-3"><i class="bi bi-info-circle text-danger me-2"></i>Giới thiệu chung</h5>
                             <p class="text-muted lh-lg" style="text-align: justify;">
-                                {{ $restaurant->description ?: 'Bún chả Hương Liên là địa chỉ ẩm thực nức tiếng tại thủ đô, từng hân hạnh đón tiếp cựu Tổng thống Mỹ Barack Obama. Không gian quán mang đậm nét văn hóa Hà Nội xưa, kết hợp cùng hương vị chả nướng than hoa truyền thống...' }}
+                                {{ $restaurant->description ?: 'Nhà hàng đang cập nhật thông tin giới thiệu chi tiết. Quý khách vui lòng quay lại sau.' }}
                             </p>
 
                             <div class="mt-4 text-muted small">

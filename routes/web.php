@@ -31,9 +31,8 @@ Route::middleware('guest')->group(function () {
 
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register'])->name('register.post');
-    Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 });
-
+Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 
 
 // ==========================================
@@ -67,6 +66,7 @@ Route::middleware('auth')->group(function () {
 
     Route::put('/profile/change-password', [App\Http\Controllers\ProfileController::class, 'changePassword'])->name('profile.changePassword');
     Route::put('/bookings/{id}/cancel', [App\Http\Controllers\BookingController::class, 'cancel'])->name('bookings.cancel');
+    
 });
 
 // ==========================================

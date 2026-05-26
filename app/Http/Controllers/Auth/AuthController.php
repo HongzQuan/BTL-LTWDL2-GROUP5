@@ -84,11 +84,16 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
+        // Đăng xuất user hiện tại
         Auth::logout();
 
+        // Hủy toàn bộ dữ liệu session cũ
         $request->session()->invalidate();
+
+        // Tạo lại CSRF token mới để bảo mật, chống lỗi 419 Page Expired
         $request->session()->regenerateToken();
 
-        return redirect('/login');
+        // Chuyển hướng người dùng về trang chủ
+        return redirect('/');
     }
 }

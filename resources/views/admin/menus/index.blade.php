@@ -114,7 +114,7 @@ $typeLabels = [
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-body">
             <form method="GET" action="{{ route('admin.menus.index') }}"
-                class="row g-3 align-items-end">
+                class="row g-3 align-items-end" enctype="multipart/form-data">
 
                 {{-- Chọn nhà hàng --}}
                 <div class="col-md-4">
@@ -265,7 +265,7 @@ $typeLabels = [
                                 {{-- Hidden delete form --}}
                                 <form id="delete-form-{{ $item->id }}"
                                     action="{{ route('admin.menus.destroy', $item->id) }}"
-                                    method="POST" class="d-none">
+                                    method="POST" class="d-none" enctype="multipart/form-data">
                                     @csrf @method('DELETE')
                                 </form>
                             </td>

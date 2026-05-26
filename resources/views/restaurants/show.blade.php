@@ -131,15 +131,36 @@
                         <div class="row g-4 mt-0">
                             @foreach($items as $item)
                             <div class="col-lg-6">
-                                <div class="d-flex align-items-end mb-1">
-                                    <div class="fw-bold text-dark fs-6">{{ $item->name }}</div>
-                                    <!-- Đường chấm (dotted) tạo phong cách menu nhà hàng -->
-                                    <div class="flex-grow-1 mx-2" style="border-bottom: 2px dotted #dee2e6; position: relative; top: -6px;"></div>
-                                    <div class="fw-bold text-danger fs-6">{{ number_format($item->price) }}đ</div>
+                                <div class="d-flex align-items-center mb-3 p-2 border rounded shadow-sm hover-menu-item bg-white">
+
+                                    <!-- VÙNG 1: ẢNH MÓN ĂN (Thu nhỏ lại 60x60 cho vừa vặn, thêm sự kiện lỗi thì hiện ảnh mặc định) -->
+                                    <div class="flex-shrink-0 me-3">
+                                        <img src="{{ $item->image ? asset($item->image) : 'https://placehold.co/100x100?text=Mon+An' }}"
+                                            class="rounded object-fit-cover shadow-sm border"
+                                            style="width: 60px; height: 60px;"
+                                            alt="{{ $item->name }}"
+                                            onerror="this.src='https://placehold.co/100x100?text=No+Image'">
+                                    </div>
+
+                                    <!-- VÙNG 2: THÔNG TIN MÓN ĂN -->
+                                    <div class="flex-grow-1 w-100">
+                                        <div class="d-flex align-items-end mb-1">
+                                            <!-- Tên món (ĐÃ BỎ text-truncate để chữ hiện đầy đủ) -->
+                                            <div class="fw-bold text-dark fs-6">{{ $item->name }}</div>
+
+                                            <!-- Đường kẻ chấm bi -->
+                                            <div class="flex-grow-1 mx-2" style="border-bottom: 2px dotted #dee2e6; position: relative; top: -6px;"></div>
+
+                                            <!-- Giá tiền -->
+                                            <div class="fw-bold text-danger fs-6 text-nowrap">{{ number_format($item->price) }}đ</div>
+                                        </div>
+
+                                        @if($item->description)
+                                        <div class="text-muted small fst-italic">{{ $item->description }}</div>
+                                        @endif
+                                    </div>
+
                                 </div>
-                                @if($item->description)
-                                <div class="text-muted small fst-italic w-75">{{ $item->description }}</div>
-                                @endif
                             </div>
                             @endforeach
                         </div>

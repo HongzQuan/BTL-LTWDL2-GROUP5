@@ -43,10 +43,15 @@ class MenuController extends Controller
     {
         $validated = $this->validateMenuItem($request);
 
-        // Upload ảnh nếu có
-        $validated['image'] = $request->hasFile('image')
-            ? $request->file('image')->store('menus', 'public')
-            : null;
+        // Thay đổi: Lưu ảnh thẳng vào public/uploads/menus
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('uploads/menus'), $filename);
+            $validated['image'] = 'uploads/menus/' . $filename;
+        } else {
+            $validated['image'] = null;
+        }
 
         MenuItem::create($validated);
 
@@ -63,10 +68,14 @@ class MenuController extends Controller
         $menuItem  = MenuItem::findOrFail($id);
         $validated = $this->validateMenuItem($request);
 
-        // Xử lý ảnh mới nếu có upload
+        // Thay đổi: Xóa ảnh cũ và up ảnh mới thẳng vào public/uploads/menus
         if ($request->hasFile('image')) {
             $this->deleteImage($menuItem->image);
-            $validated['image'] = $request->file('image')->store('menus', 'public');
+
+            $file = $request->file('image');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('uploads/menus'), $filename);
+            $validated['image'] = 'uploads/menus/' . $filename;
         }
 
         $menuItem->update($validated);
@@ -75,7 +84,6 @@ class MenuController extends Controller
             ->route('admin.menus.index', $this->filterParams($request))
             ->with('success', 'Đã cập nhật món ăn thành công.');
     }
-
     // ─────────────────────────────────────────────────────────────────────
     // DESTROY
     // ─────────────────────────────────────────────────────────────────────
@@ -135,8 +143,9 @@ class MenuController extends Controller
     /** Xóa file ảnh cũ khỏi storage */
     private function deleteImage(?string $path): void
     {
-        if ($path && Storage::disk('public')->exists($path)) {
-            Storage::disk('public')->delete($path);
+        // Vì ảnh giờ nằm thẳng ở public, ta dùng file_exists và unlink của PHP
+        if ($path && file_exists(public_path($path))) {
+            unlink(public_path($path));
         }
     }
 

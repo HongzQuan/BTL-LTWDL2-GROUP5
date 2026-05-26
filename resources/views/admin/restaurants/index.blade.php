@@ -2,7 +2,6 @@
 
 @section('content')
 <div class="container-fluid py-4">
-    <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h2 class="fw-bold text-dark m-0">Quản lý Nhà hàng</h2>
@@ -13,7 +12,6 @@
         </a>
     </div>
 
-    <!-- Thông báo Success -->
     @if(session('success'))
     <div class="alert alert-success alert-dismissible fade show shadow-sm border-0" role="alert">
         <strong class="me-1">Thành công!</strong> {{ session('success') }}
@@ -21,7 +19,6 @@
     </div>
     @endif
 
-    <!-- Card Bảng dữ liệu -->
     <div class="card border-0 shadow-sm overflow-hidden">
         <div class="card-body p-0">
             <div class="table-responsive">
@@ -41,7 +38,7 @@
                         <tr>
                             <td class="ps-4 text-center fw-semibold text-muted">#{{ $restaurant->id }}</td>
                             <td>
-                                <img src="{{ $restaurant->image ? asset('$restaurant->image) : 'https://placehold.co/100x75?text=No+Image' }}"
+                                <img src="{{ $restaurant->image ? asset($restaurant->image) : 'https://placehold.co/100x75?text=No+Image' }}"
                                     alt="{{ $restaurant->name }}" class="rounded shadow-sm object-fit-cover"
                                     style="width: 90px; height: 65px;">
                             </td>
@@ -66,23 +63,16 @@
                             </td>
                             <td class="text-end pe-4">
                                 <div class="btn-group" role="group">
-                                    <!-- Nút Sửa -->
                                     <a href="{{ route('admin.restaurants.edit', $restaurant->id) }}"
                                         class="btn btn-sm btn-outline-primary" title="Chỉnh sửa">
                                         Sửa
                                     </a>
-                                    <!-- Nút Xóa (Dùng Form vì Route Destroy bắt buộc method DELETE) -->
-<<<<<<< HEAD
-                                    <form action="{{ route('admin.restaurants.destroy', $restaurant->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa nhà hàng này không?');">
-=======
                                     <form action="{{ route('admin.restaurants.destroy', $restaurant->id) }}"
                                         method="POST" class="d-inline-block m-0"
                                         onsubmit="return confirm('Bạn có chắc chắn muốn xóa nhà hàng [{{ $restaurant->name }}] không? Hành động này không thể hoàn tác!');">
->>>>>>> b4c354c54080a211c87f4eb2d1008b731973b524
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-outline-danger btn-sm">Xóa</button>
-                                    </form>
                                     </form>
                                 </div>
                             </td>
@@ -101,7 +91,6 @@
             </div>
         </div>
 
-        <!-- Footer Card: Phân trang -->
         @if($restaurants->hasPages())
         <div class="card-footer bg-white border-top py-3 d-flex justify-content-center">
             {{ $restaurants->links('pagination::bootstrap-5') }}

@@ -78,12 +78,10 @@ class RestaurantController extends Controller
      */
     public function show($id)
     {
-        // Load nhà hàng kèm các quan hệ cần thiết
         $restaurant = Restaurant::active()
             ->with(['category', 'tables', 'menuItems', 'reviews.user'])
             ->findOrFail($id);
 
-        // Tính phân phối rating (Đếm số lượng 1-5 sao)
         $ratingDistribution = [5 => 0, 4 => 0, 3 => 0, 2 => 0, 1 => 0];
         foreach ($restaurant->reviews as $review) {
             if (isset($ratingDistribution[$review->rating])) {
@@ -91,15 +89,23 @@ class RestaurantController extends Controller
             }
         }
 
-        // Lấy 4 nhà hàng tương tự (cùng category, khác nhà hàng hiện tại)
-        $similar = Restaurant::active()
+        // Lấy 4 nhà hàng tương tự CÙNG DANH MỤC
+        $similarRestaurants = Restaurant::active()
             ->where('category_id', $restaurant->category_id)
             ->where('id', '!=', $restaurant->id)
             ->inRandomOrder()
             ->limit(4)
             ->get();
 
-        // Kiểm tra quyền đánh giá: User đã login & có booking hoàn thành tại đây
+        // DỰ PHÒNG: Nếu không có nhà hàng cùng danh mục, lấy ngẫu nhiên 4 nhà hàng khác
+        if ($similarRestaurants->isEmpty()) {
+            $similarRestaurants = Restaurant::active()
+                ->where('id', '!=', $restaurant->id)
+                ->inRandomOrder()
+                ->limit(4)
+                ->get();
+        }
+
         $canReview = false;
         if (Auth::check()) {
             $canReview = \App\Models\Booking::where('user_id', Auth::id())
@@ -108,9 +114,9 @@ class RestaurantController extends Controller
                 ->exists();
         }
 
-        return view('restaurants.show', compact('restaurant', 'ratingDistribution', 'similar', 'canReview'));
+        // Truyền đúng tên biến sang View
+        return view('restaurants.show', compact('restaurant', 'ratingDistribution', 'similarRestaurants', 'canReview'));
     }
-
     /**
      * Tìm kiếm nhà hàng (Yêu cầu phải có từ khóa q)
      */

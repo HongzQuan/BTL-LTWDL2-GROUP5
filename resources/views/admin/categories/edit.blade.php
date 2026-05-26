@@ -4,7 +4,7 @@
 <div class="card shadow-sm col-md-8 mx-auto">
     <div class="card-header bg-white fw-bold">Chỉnh sửa Danh mục</div>
     <div class="card-body">
-        <form action="{{ route('categories.update', $category) }}" method="POST">
+        <form action="{{ route('admin.categories.update', $category) }}" method="POST">
             @csrf
             @method('PUT')
             <div class="mb-3">
@@ -17,7 +17,7 @@
                 <textarea name="description" class="form-control" rows="4">{{ old('description', $category->description) }}</textarea>
             </div>
             <button type="submit" class="btn btn-primary">Cập nhật</button>
-            <a href="{{ route('categories.index') }}" class="btn btn-secondary">Hủy</a>
+            <a href="{{ route('admin.categories.index') }}" class="btn btn-secondary">Hủy</a>
         </form>
     </div>
 </div>

@@ -11,6 +11,7 @@ use App\Http\Controllers\RestaurantController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\ProfileController;
 
 // Khai báo Controllers của Admin (Dùng alias để tránh trùng tên với Frontend)
 use App\Http\Controllers\Admin\DashboardController;
@@ -30,9 +31,10 @@ Route::middleware('guest')->group(function () {
 
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register'])->name('register.post');
+    Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 });
 
-Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
+
 
 // ==========================================
 // 3. ROUTES FRONTEND (DÀNH CHO KHÁCH HÀNG)
@@ -58,6 +60,13 @@ Route::middleware('auth')->group(function () {
 
     // Đánh giá
     Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+
+    Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'index'])->name('profile');
+
+    Route::put('/profile/update', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
+
+    Route::put('/profile/change-password', [App\Http\Controllers\ProfileController::class, 'changePassword'])->name('profile.changePassword');
+    Route::put('/bookings/{id}/cancel', [App\Http\Controllers\BookingController::class, 'cancel'])->name('bookings.cancel');
 });
 
 // ==========================================
@@ -98,3 +107,27 @@ Route::prefix('admin')
         Route::get('reviews', [AdminReviewController::class, 'index'])->name('reviews.index');
         Route::delete('reviews/{id}', [AdminReviewController::class, 'destroy'])->name('reviews.destroy');
     });
+Route::get('/pump-reviews', function () {
+    // Tìm quán Bún chả (Thay ID = 1 bằng ID thật của quán Bún Chả trong DB của em)
+    $restaurant = \App\Models\Restaurant::find(1); 
+    $user = \App\Models\User::first();
+
+    if ($restaurant && $user) {
+        $comments = [
+            'Quán rộng rãi, sạch sẽ. Bún chả nướng rất thơm, nước chấm vừa miệng!',
+            'Đỉnh cao ẩm thực Hà Nội. Mình ăn ở đây từ hồi sinh viên đến giờ hương vị vẫn không đổi.',
+            'Nhân viên phục vụ nhiệt tình dù quán rất đông. Sẽ quay lại ủng hộ thường xuyên.'
+        ];
+
+        foreach ($comments as $comment) {
+            \App\Models\Review::create([
+                'restaurant_id' => $restaurant->id,
+                'user_id' => $user->id,
+                'rating' => 5,
+                'comment' => $comment,
+            ]);
+        }
+        return 'Đã bơm đánh giá thành công!';
+    }
+    return 'Lỗi: Không tìm thấy nhà hàng hoặc user';
+});

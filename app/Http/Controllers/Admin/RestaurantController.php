@@ -111,7 +111,7 @@ class RestaurantController extends Controller
         // Xử lý upload ảnh mới (nếu có chọn ảnh khác)
         if ($request->hasFile('image')) {
             $path = $request->file('image')->store('restaurants', 'public');
-            $restaurant->image_url = '/storage/' . $path;
+            $restaurant->image = '/storage/' . $path;
             // Ở cột CSDL của em nếu dùng 'image' thì sửa thành: $restaurant->image = $path;
         }
 
@@ -122,7 +122,7 @@ class RestaurantController extends Controller
 
     public function destroy($id)
     {
-        $restaurant = Restaurant::findOrFail($id);
+        $restaurant = \App\Models\Restaurant::findOrFail($id);
 
         // Kiểm tra booking pending/confirmed
         // Giả sử quan hệ trong Model Restaurant là: public function bookings() { return $this->hasMany(Booking::class); }
@@ -144,56 +144,26 @@ class RestaurantController extends Controller
             'status' => 0,
             'image'  => null
         ]);
-
-        return redirect()->route('admin.restaurants.index')->with('success', 'Đã vô hiệu hóa nhà hàng thành công!');
+        $restaurant->delete();
+        return redirect()->route('admin.restaurants.index')->with('success', 'Đã xóa nhà hàng thành công!');
     }
 
     public function show($id)
     {
-        // 1. Tải thông tin Nhà hàng, GỘP LẤY LUÔN cả Category, MenuItems và Reviews
-        // Dùng with() giúp tối ưu hóa, gọi Database 1 lần lấy được hết dữ liệu liên quan
-        $restaurant = \App\Models\Restaurant::with(['category', 'menuItems', 'reviews.user'])->findOrFail($id);
+        $restaurant = Restaurant::findOrFail($id);
 
-        // 2. Logic tính toán Đánh giá (Rating)
-        $averageRating = $restaurant->reviews->avg('rating') ?? 0;
-
-        $ratingCounts = [5 => 0, 4 => 0, 3 => 0, 2 => 0, 1 => 0];
-        foreach ($restaurant->reviews as $review) {
-            $ratingCounts[$review->rating]++;
-        }
-
-        // 3. Logic lấy Nhà hàng tương tự (Gợi ý)
-        // Tìm các nhà hàng CÙNG DANH MỤC, KHÁC ID hiện tại, lấy ngẫu nhiên 4 cái
-        $similarRestaurants = \App\Models\Restaurant::where('category_id', $restaurant->category_id)
-            ->where('id', '!=', $id)
+        // Tìm các nhà hàng CÙNG DANH MỤC, loại trừ nhà hàng hiện tại
+        $similar = Restaurant::where('category_id', $restaurant->category_id)
+            ->where('id', '!=', $restaurant->id)
             ->inRandomOrder()
-            ->limit(4)
+            ->take(4)
             ->get();
 
-        // Nếu Database chưa có nhà hàng nào cùng danh mục, tự động lấy ngẫu nhiên nhà hàng bất kỳ
-        if ($similarRestaurants->isEmpty()) {
-            $similarRestaurants = \App\Models\Restaurant::where('id', '!=', $id)
-                ->inRandomOrder()
-                ->limit(4)
-                ->get();
+        // DỰ PHÒNG: Nếu chuyên mục này ít quá không có nhà hàng nào giống, thì lấy ĐẠI 4 nhà hàng ngẫu nhiên trong hệ thống cho giao diện khỏi bị trống
+        if ($similar->isEmpty()) {
+            $similar = Restaurant::where('id', '!=', $restaurant->id)->inRandomOrder()->take(4)->get();
         }
 
-        // 4. Logic kiểm tra quyền viết Review (Chỉ ai đã đặt bàn thành công mới được viết)
-        $canReview = false;
-        if (auth()->check()) {
-            $canReview = \App\Models\Booking::where('user_id', auth()->id())
-                ->where('restaurant_id', $id)
-                ->where('status', 'completed')
-                ->exists();
-        }
-
-        // Truyền toàn bộ biến ra ngoài giao diện (View)
-        return view('restaurants.show', compact(
-            'restaurant',
-            'averageRating',
-            'ratingCounts',
-            'similarRestaurants',
-            'canReview'
-        ));
+        return view('restaurants.show', compact('restaurant', 'similar'));
     }
 }

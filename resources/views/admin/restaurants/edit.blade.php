@@ -82,11 +82,11 @@
                                 <h6 class="fw-bold mb-3">Khoảng giá (VNĐ)</h6>
                                 <div class="mb-3">
                                     <label class="form-label small">Giá tối thiểu</label>
-                                    <input type="number" name="price_min" class="form-control" value="{{ $restaurant->price_min }}">
+                                    <input type="number" name="price_min" value="{{ old('price_min', $restaurant->price_min) }}" class="form-control">
                                 </div>
                                 <div class="mb-0">
                                     <label class="form-label small">Giá tối đa</label>
-                                    <input type="number" name="price_max" class="form-control" value="{{ $restaurant->price_max }}">
+                                    <input type="number" name="price_max" value="{{ old('price_max', $restaurant->price_max) }}" class="form-control">
                                 </div>
                             </div>
                         </div>

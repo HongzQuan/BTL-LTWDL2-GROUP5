@@ -71,15 +71,11 @@
                                         Sửa
                                     </a>
                                     <!-- Nút Xóa (Dùng Form vì Route Destroy bắt buộc method DELETE) -->
-                                    <form action="{{ route('admin.restaurants.destroy', $restaurant->id) }}"
-                                        method="POST"
-                                        class="d-inline-block m-0"
-                                        onsubmit="return confirm('Bạn có chắc chắn muốn xóa nhà hàng [{{ $restaurant->name }}] không? Hành động này không thể hoàn tác!');">
+                                    <form action="{{ route('admin.restaurants.destroy', $restaurant->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa nhà hàng này không?');">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Xóa">
-                                            Xóa
-                                        </button>
+                                        <button type="submit" class="btn btn-outline-danger btn-sm">Xóa</button>
+                                    </form>
                                     </form>
                                 </div>
                             </td>

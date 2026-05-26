@@ -46,8 +46,8 @@ class BookingController extends Controller
             ->where('capacity', '>=', $guests)
             ->whereDoesntHave('bookings', function ($query) use ($date, $time) {
                 $query->where('booking_date', $date)
-                      ->where('booking_time', $time)
-                      ->whereIn('status', ['pending', 'confirmed']);
+                    ->where('booking_time', $time)
+                    ->whereIn('status', ['pending', 'confirmed']);
             })
             ->orderBy('capacity')
             ->get();
@@ -207,38 +207,37 @@ class BookingController extends Controller
     // PUT /bookings/{id}/cancel
     // (Đã qua middleware booking.owner)
     // =========================================================
-    public function cancel(Request $request, int $id)
-    {
-        /** @var Booking $booking */
-        $booking = $request->attributes->get('booking');
-        if (!$booking) {
-            $booking = Booking::findOrFail($id);
-        }
-        // Chỉ cho hủy khi đang ở trạng thái pending
-        if ($booking->status !== 'pending') {
-            return redirect()
-                ->back()
-                ->with('error', 'Chỉ có thể hủy đơn đang chờ xác nhận.');
-        }
-
-        $booking->update(['status' => 'cancelled']);
-
-        return redirect()
-            ->back()
-            ->with('success', "Đã hủy đơn đặt bàn #{$booking->id} thành công.");
-    }
-
     public function history(Request $request)
-{
-    // Lấy trạng thái từ filter, nếu không có thì lấy tất cả
-    $status = $request->status; 
-    
-    $bookings = \App\Models\Booking::where('user_id', auth()->id())
-                    ->with('restaurant')
-                    ->status($status) // Dùng scope đã tạo
-                    ->latest()
-                    ->get();
+    {
+        // Lấy trạng thái từ filter, nếu không có thì lấy tất cả
+        $status = $request->status;
 
-    return view('bookings.history', compact('bookings', 'status'));
-}
+        $bookings = \App\Models\Booking::where('user_id', auth()->id())
+            ->with('restaurant')
+            ->status($status) // Dùng scope đã tạo
+            ->latest()
+            ->get();
+
+        return view('bookings.history', compact('bookings', 'status'));
+    }
+    public function cancel(Request $request, $id)
+    {
+        // Tìm đơn hàng, bắt buộc phải là đơn của user đang đăng nhập
+        $booking = \App\Models\Booking::where('user_id', auth()->id())->findOrFail($id);
+
+        // Kiểm tra xem đơn đã bị hủy hoặc đã hoàn thành trước đó chưa
+        if ($booking->status === 'cancelled' || $booking->status === 'completed') {
+            return back()->with('error', 'Không thể thao tác. Đơn đặt bàn này đã chốt trạng thái.');
+        }
+
+        // Cập nhật trạng thái thành Đã hủy
+        $booking->status = 'cancelled';
+
+        // Nếu trong Database của em có tạo sẵn cột cancel_reason để lưu lý do hủy thì mở comment dòng dưới:
+        // $booking->cancel_reason = $request->cancel_reason;
+
+        $booking->save();
+
+        return back()->with('success', 'Đã hủy đơn đặt bàn thành công.');
+    }
 }

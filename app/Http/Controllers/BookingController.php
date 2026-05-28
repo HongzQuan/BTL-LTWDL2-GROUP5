@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Models\Booking;
 use App\Models\Restaurant;
 use App\Models\Table;
@@ -28,6 +29,13 @@ class BookingController extends Controller
         $time         = $request->input('time');
         $guests       = $request->integer('guests');
 
+        // CHỐT CHẶN 1: Kiểm tra nếu ngày giờ chọn ở trang chi tiết đã trôi qua
+        $bookingDateTime = Carbon::parse($date . ' ' . $time);
+        if ($bookingDateTime->isPast()) {
+            return redirect()->back()
+                ->with('error', 'Thời gian đặt bàn đã qua so với hiện tại. Vui lòng chọn giờ khác trong tương lai!');
+        }
+
         $restaurant = Restaurant::findOrFail($restaurantId);
 
         $availableTables = Table::where('restaurant_id', $restaurantId)
@@ -48,6 +56,17 @@ class BookingController extends Controller
      */
     public function store(Request $request)
     {
+        // CHỐT CHẶN 2: Kiểm tra một lần nữa trước khi ghi dữ liệu vào Database để chống hack form
+        if ($request->filled(['booking_date', 'booking_time'])) {
+            $bookingDateTime = Carbon::parse($request->booking_date . ' ' . $request->booking_time);
+            
+            if ($bookingDateTime->isPast()) {
+                return back()
+                    ->with('error', 'Lỗi: Thời gian đặt bàn đã qua. Vui lòng quay lại chọn giờ khác trong tương lai!')
+                    ->withInput();
+            }
+        }
+
         $validated = $request->validate([
             'restaurant_id' => ['required', 'integer', 'exists:restaurants,id'],
             'table_id'      => ['required', 'integer', 'exists:tables,id'],

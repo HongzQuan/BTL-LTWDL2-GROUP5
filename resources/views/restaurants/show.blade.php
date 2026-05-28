@@ -287,8 +287,8 @@
                         <div class="mb-4">
                             <label class="form-label text-muted small mb-1"><i class="bi bi-calendar3 me-1"></i> Thời gian đến</label>
                             <div class="d-flex gap-2">
-                                <input type="date" name="date" class="form-control" value="{{ date('Y-m-d') }}" required>
-                                <input type="time" name="time" class="form-control" value="18:30" required>
+                                <input type="date" name="date" id="booking_date" class="form-control" value="{{ date('Y-m-d') }}" min="{{ date('Y-m-d') }}" required>
+                                <input type="time" name="time" id="booking_time" class="form-control" value="18:30" required>
                             </div>
                         </div>
 
@@ -365,4 +365,35 @@
         border: 1px solid rgba(220, 53, 69, 0.2) !important;
     }
 </style>
+
+<script>
+    document.getElementById('widgetBookingForm').addEventListener('submit', function(e) {
+        const dateInput = document.getElementById('booking_date').value;
+        const timeInput = document.getElementById('booking_time').value;
+
+        if (!dateInput || !timeInput) return;
+
+        // Lấy thời gian thực tế từ máy tính của khách
+        const now = new Date();
+
+        // Định dạng ngày hôm nay thành chuỗi YYYY-MM-DD
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        const todayStr = `${year}-${month}-${day}`;
+
+        // Nếu khách chọn ngày hôm nay thì mới cần so sánh giờ
+        if (dateInput === todayStr) {
+            const currentHours = String(now.getHours()).padStart(2, '0');
+            const currentMinutes = String(now.getMinutes()).padStart(2, '0');
+            const currentTimeStr = `${currentHours}:${currentMinutes}`; // Kết quả dạng HH:mm giống input time
+
+            // Nếu giờ khách chọn nhỏ hơn giờ hiện tại
+            if (timeInput < currentTimeStr) {
+                e.preventDefault(); // Chặn gửi form chuyển trang
+                alert(`Lỗi: Không thể đặt bàn ở thời gian đã qua! Hiện tại đã là ${currentTimeStr}, vui lòng chọn giờ muộn hơn.`);
+            }
+        }
+    });
+</script>
 @endsection

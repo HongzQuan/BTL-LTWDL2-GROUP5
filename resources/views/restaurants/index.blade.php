@@ -143,41 +143,25 @@
     </div>
 </div>
 <style>
-.hover-shadow {
-    border-radius: 18px;
+.restaurant-card {
+    border-radius: 20px;
     overflow: hidden;
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    transition: all 0.3s ease;
+    background: #fff;
 }
 
-.hover-shadow:hover {
-    transform: translateY(-8px) scale(1.01);
-    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12) !important;
+.restaurant-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.12) !important;
 }
 
-.transition-all {
-    transition: all 0.25s linear;
+.restaurant-card img {
+    transition: transform 0.45s ease;
 }
 
-.backdrop-blur {
-    backdrop-filter: blur(8px);
-    background: rgba(0, 0, 0, 0.45) !important;
-}
-
-.card img {
-    transition: transform 0.4s ease;
-}
-
-.card:hover img {
-    transform: scale(1.06);
-}
-
-.btn-primary {
-    border-radius: 12px;
-    font-weight: 600;
-}
-
-.badge {
-    letter-spacing: 0.5px;
+.restaurant-card:hover img {
+    transform: scale(1.08);
 }
 </style>
+
 @endsection

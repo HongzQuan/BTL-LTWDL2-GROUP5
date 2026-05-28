@@ -276,7 +276,37 @@
 
                 </div>
             </div>
+            {{-- HIỂN THỊ NÚT THANH TOÁN KHI ĐƠN ĐANG CHỜ XÁC NHẬN --}}
+            @if($booking->status == 'pending')
+            <div class="card border-primary mb-4 shadow-sm">
+                <div class="card-body text-center p-4">
+                    <h5 class="card-title text-primary fw-bold mb-2">Thanh toán tiền cọc</h5>
+                    <p class="small text-muted mb-4">Vui lòng thanh toán cọc <strong>200.000đ</strong> để nhà hàng giữ chỗ cho bạn.</p>
 
+                    <form action="{{ route('vnpay.payment', $booking->id) }}" method="POST">
+                        @csrf
+                        <button type="submit" class="btn btn-primary w-100 py-3 fw-bold fs-6 d-flex align-items-center justify-content-center gap-2" style="background-color: #005baa; border: none;">
+                            <i class="bi bi-credit-card"></i> Thanh toán qua VNPAY
+                        </button>
+                    </form>
+                </div>
+            </div>
+            @endif
+            {{-- HIỂN THỊ KHI ĐÃ THANH TOÁN THÀNH CÔNG --}}
+            @if($booking->status == 'confirmed')
+            <div class="alert alert-success border-0 shadow-sm mb-4" style="background-color: #d1e7dd; border-left: 5px solid #198754 !important;">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-check-circle-fill fs-1 text-success me-3"></i>
+                    <div>
+                        <h5 class="alert-heading mb-1 fw-bold text-success">Thanh toán cọc thành công!</h5>
+                        <p class="mb-0 text-dark">
+                            Hệ thống đã ghi nhận khoản tiền cọc <strong>200.000đ</strong> qua VNPAY. <br>
+                            Nhà hàng đã giữ bàn cho bạn. Chúc bạn có một bữa ăn ngon miệng!
+                        </p>
+                    </div>
+                </div>
+            </div>
+            @endif
             {{-- ===== HỦY ĐƠN ===== --}}
             @if($canCancel)
             <div class="card border-danger border-opacity-50 rounded-3 mb-4">

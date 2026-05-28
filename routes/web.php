@@ -133,3 +133,6 @@ Route::get('/pump-reviews', function () {
     }
     return 'Lỗi: Không tìm thấy nhà hàng hoặc user';
 });
+
+Route::get('/vnpay/return', [App\Http\Controllers\BookingController::class, 'vnpayReturn'])->name('vnpay.return');
+Route::post('/bookings/{id}/pay', [App\Http\Controllers\BookingController::class, 'createPayment'])->name('vnpay.payment');

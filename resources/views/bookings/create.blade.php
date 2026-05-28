@@ -265,7 +265,7 @@
             <div class="card shadow-sm border-0 rounded-3 mb-4">
                 <div class="card-body p-4">
                     @if($restaurant->image)
-                    <img src="{{ asset('storage/' . $restaurant->image) }}"
+                    <img src="{{ asset($restaurant->image) }}"
                         alt="{{ $restaurant->name }}"
                         class="img-fluid rounded-3 mb-3 w-100"
                         style="height: 160px; object-fit: cover;">

@@ -191,7 +191,7 @@ $typeLabels = [
                             {{-- Ảnh thumbnail --}}
                             <td>
                                 @if($item->image)
-                                <img src="{{ Storage::url($item->image) }}"
+                                <img src="{{ asset($item->image) }}"
                                     alt="{{ $item->name }}"
                                     width="40" height="40"
                                     class="rounded object-fit-cover border">

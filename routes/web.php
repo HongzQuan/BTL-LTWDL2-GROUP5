@@ -10,11 +10,11 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RestaurantController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ReviewController;
-use App\Http\Controllers\Admin\CategoryController;
-use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\ProfileController; // Đã thêm để tối ưu code bên dưới
 
 // Khai báo Controllers của Admin (Dùng alias để tránh trùng tên với Frontend)
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\RestaurantController as AdminRestaurantController;
 use App\Http\Controllers\Admin\TableController;
 use App\Http\Controllers\Admin\BookingController as AdminBookingController;
@@ -45,9 +45,9 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/restaurants/search', [RestaurantController::class, 'search'])->name('restaurants.search');
 Route::get('/restaurants', [RestaurantController::class, 'index'])->name('restaurants.index');
 Route::get('/restaurants/{id}', [RestaurantController::class, 'show'])->name('restaurants.show');
-Route::get('/my-bookings', [App\Http\Controllers\BookingController::class, 'history'])->name('bookings.history');
+Route::get('/my-bookings', [BookingController::class, 'history'])->name('bookings.history');
 
-// Chức năng yêu cầu đăng nhập (Đặt bàn, Đánh giá)
+// Chức năng yêu cầu đăng nhập (Đặt bàn, Đánh giá, Profile)
 Route::middleware('auth')->group(function () {
 
     // Đặt bàn
@@ -60,13 +60,10 @@ Route::middleware('auth')->group(function () {
     // Đánh giá
     Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store');
 
-    Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'index'])->name('profile');
-
-    Route::put('/profile/update', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
-
-    Route::put('/profile/change-password', [App\Http\Controllers\ProfileController::class, 'changePassword'])->name('profile.changePassword');
-    Route::put('/bookings/{id}/cancel', [App\Http\Controllers\BookingController::class, 'cancel'])->name('bookings.cancel');
-    
+    // Quản lý tài khoản (Profile)
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile');
+    Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/change-password', [ProfileController::class, 'changePassword'])->name('profile.changePassword');
 });
 
 // ==========================================
@@ -79,11 +76,12 @@ Route::prefix('admin')
 
         // Dashboard
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+        
+        // Quản lý Danh mục
         Route::resource('categories', CategoryController::class);
+        
         // Quản lý Nhà hàng
-        // Quản lý Nhà hàng (Xóa chữ /admin đi vì đã có prefix bao ngoài)
-        Route::get('/restaurants', [AdminRestaurantController::class, 'index'])->name('restaurants.index');
-        Route::resource('restaurants', \App\Http\Controllers\Admin\RestaurantController::class);
+        Route::resource('restaurants', AdminRestaurantController::class);
 
         // Quản lý Bàn
         Route::put('tables/{id}/toggle-status', [TableController::class, 'toggleStatus'])->name('tables.toggleStatus');
@@ -107,8 +105,12 @@ Route::prefix('admin')
         Route::get('reviews', [AdminReviewController::class, 'index'])->name('reviews.index');
         Route::delete('reviews/{id}', [AdminReviewController::class, 'destroy'])->name('reviews.destroy');
     });
+
+// ==========================================
+// 5. TEST ROUTES (DỮ LIỆU MẪU)
+// ==========================================
 Route::get('/pump-reviews', function () {
-    // Tìm quán Bún chả (Thay ID = 1 bằng ID thật của quán Bún Chả trong DB của em)
+    // Tìm quán Bún chả (Thay ID = 1 bằng ID thật của quán Bún Chả trong DB của bạn)
     $restaurant = \App\Models\Restaurant::find(1); 
     $user = \App\Models\User::first();
 

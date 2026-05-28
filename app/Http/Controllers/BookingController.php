@@ -1,5 +1,4 @@
 <?php
-// app/Http/Controllers/BookingController.php
 
 namespace App\Http\Controllers;
 
@@ -13,15 +12,10 @@ use Illuminate\Validation\ValidationException;
 class BookingController extends Controller
 {
     /**
-     * Áp dụng auth middleware cho toàn bộ controller.
+     * CREATE — Hiển thị form đặt bàn
      */
-    // =========================================================
-    // CREATE — Hiển thị form đặt bàn
-    // GET /bookings/create?restaurant_id=&date=&time=&guests=
-    // =========================================================
     public function create(Request $request)
     {
-        // --- Validate query string đầu vào ---
         $request->validate([
             'restaurant_id' => ['required', 'integer', 'exists:restaurants,id'],
             'date'          => ['required', 'date', 'date_format:Y-m-d', 'after_or_equal:today'],
@@ -34,14 +28,8 @@ class BookingController extends Controller
         $time         = $request->input('time');
         $guests       = $request->integer('guests');
 
-        // --- Load nhà hàng ---
         $restaurant = Restaurant::findOrFail($restaurantId);
 
-        // --- Lấy danh sách bàn còn trống ---
-        // Điều kiện:
-        //   1. Thuộc nhà hàng này
-        //   2. capacity >= số khách
-        //   3. Chưa có booking nào cùng date + time với status pending/confirmed
         $availableTables = Table::where('restaurant_id', $restaurantId)
             ->where('capacity', '>=', $guests)
             ->whereDoesntHave('bookings', function ($query) use ($date, $time) {
@@ -52,22 +40,14 @@ class BookingController extends Controller
             ->orderBy('capacity')
             ->get();
 
-        return view('bookings.create', compact(
-            'restaurant',
-            'availableTables',
-            'date',
-            'time',
-            'guests'
-        ));
+        return view('bookings.create', compact('restaurant', 'availableTables', 'date', 'time', 'guests'));
     }
 
-    // =========================================================
-    // STORE — Xử lý submit form đặt bàn
-    // POST /bookings
-    // =========================================================
+    /**
+     * STORE — Xử lý submit form đặt bàn
+     */
     public function store(Request $request)
     {
-        // --- Validate dữ liệu form ---
         $validated = $request->validate([
             'restaurant_id' => ['required', 'integer', 'exists:restaurants,id'],
             'table_id'      => ['required', 'integer', 'exists:tables,id'],
@@ -77,16 +57,12 @@ class BookingController extends Controller
             'note'          => ['nullable', 'string', 'max:500'],
         ]);
 
-        // --- Dùng DB Transaction + lock để tránh race condition ---
         $booking = DB::transaction(function () use ($validated) {
-
-            // Lock row của bàn lại trong transaction
             $table = Table::where('id', $validated['table_id'])
                 ->where('restaurant_id', $validated['restaurant_id'])
-                ->lockForUpdate()   // <-- SELECT ... FOR UPDATE
+                ->lockForUpdate()
                 ->firstOrFail();
 
-            // Kiểm tra lại bàn còn trống tại thời điểm submit
             $isBooked = Booking::where('table_id', $table->id)
                 ->where('booking_date', $validated['booking_date'])
                 ->where('booking_time', $validated['booking_time'])
@@ -94,149 +70,69 @@ class BookingController extends Controller
                 ->exists();
 
             if ($isBooked) {
-                // Ném exception để rollback transaction và hiển thị lỗi
-                throw ValidationException::withMessages([
-                    'table_id' => 'Bàn này vừa được đặt bởi người khác. Vui lòng chọn bàn khác.',
-                ]);
+                throw ValidationException::withMessages(['table_id' => 'Bàn này vừa được đặt bởi người khác.']);
             }
 
-            // Kiểm tra capacity
             if ($table->capacity < $validated['guests']) {
-                throw ValidationException::withMessages([
-                    'guests' => "Bàn này chỉ phục vụ tối đa {$table->capacity} khách.",
-                ]);
+                throw ValidationException::withMessages(['guests' => "Bàn này chỉ phục vụ tối đa {$table->capacity} khách."]);
             }
 
-            // Tạo booking
-            return Booking::create([
-                'user_id'       => auth()->id(),
-                'restaurant_id' => $validated['restaurant_id'],
-                'table_id'      => $table->id,
-                'booking_date'  => $validated['booking_date'],
-                'booking_time'  => $validated['booking_time'],
-                'guests'        => $validated['guests'],
-                'note'          => $validated['note'] ?? null,
-                'status'        => 'pending',
-            ]);
+            return Booking::create(array_merge($validated, [
+                'user_id' => auth()->id(),
+                'status'  => 'pending',
+            ]));
         });
 
-        return redirect()
-            ->route('bookings.show', $booking->id)
+        return redirect()->route('bookings.show', $booking->id)
             ->with('success', "Đặt bàn thành công! Mã đơn #{$booking->id}");
     }
 
-    // =========================================================
-    // INDEX — Danh sách đặt bàn của user
-    // GET /bookings?status=
-    // =========================================================
+    /**
+     * INDEX — Danh sách đặt bàn của user
+     */
     public function index(Request $request)
     {
-        $request->validate([
-            'status' => ['nullable', 'string', 'in:pending,confirmed,cancelled,completed'],
-        ]);
+        $status = $request->input('status');
 
         $bookings = Booking::with(['restaurant', 'table'])
             ->where('user_id', auth()->id())
-            // Lọc theo status nếu có
-            ->when($request->filled('status'), function ($query) use ($request) {
-                $query->where('status', $request->input('status'));
+            ->when($status, function ($query) use ($status) {
+                $query->where('status', $status);
             })
-            ->orderBy('booking_date', 'desc')
-            ->orderBy('booking_time', 'desc')
+            ->latest('booking_date')
             ->paginate(10)
-            ->withQueryString(); // Giữ query string khi chuyển trang
+            ->withQueryString();
 
-        // Truyền status hiện tại để highlight tab/filter trên view
-        $currentStatus = $request->input('status');
-
-        return view('bookings.index', compact('bookings', 'currentStatus'));
+        return view('bookings.index', compact('bookings', 'status'));
     }
 
-    // =========================================================
-    // SHOW — Chi tiết một đơn đặt bàn
-    // GET /bookings/{id}
-    // (Đã qua middleware booking.owner)
-    // =========================================================
+    /**
+     * SHOW — Chi tiết đơn
+     */
     public function show(Request $request, int $id)
     {
-        // Middleware đã query và gắn sẵn booking vào request attributes
-        // Dùng lại để tránh query lần 2
-        /** @var Booking $booking */
-        $booking = $request->attributes->get('booking');
+        $booking = Booking::with(['restaurant', 'table', 'user'])->where('user_id', auth()->id())->findOrFail($id);
 
-        // Load thêm relationships cần thiết
-        if (!$booking) {
-            $booking = Booking::with([
-                'restaurant',
-                'table',
-                'user'
-            ])->findOrFail($id);
-        }
-
-        $booking->load([
-            'restaurant',
-            'table',
-            'user'
-        ]);
-
-        // Có thể hủy không?
         $canCancel = $booking->status === 'pending';
-
-        // Có thể review không?
-        // Điều kiện: đã hoàn thành VÀ chưa có review của user này tại nhà hàng này
-        $canReview = false;
-        if (
-            $booking->status === 'completed'
-            && $booking->restaurant
-            && method_exists($booking->restaurant, 'reviews')
-        ) {
-            $canReview = ! $booking->restaurant
-                ->reviews()
-                ->where(
-                    'user_id',
-                    auth()->id()
-                )
-                ->exists();
-        }
+        
+        $canReview = ($booking->status === 'completed') && 
+                     !$booking->restaurant->reviews()->where('user_id', auth()->id())->exists();
 
         return view('bookings.show', compact('booking', 'canCancel', 'canReview'));
     }
 
-    // =========================================================
-    // CANCEL — Hủy đặt bàn
-    // PUT /bookings/{id}/cancel
-    // (Đã qua middleware booking.owner)
-    // =========================================================
-    public function history(Request $request)
+    /**
+     * CANCEL — Hủy đặt bàn
+     */
+    public function cancel(int $id)
     {
-        // Lấy trạng thái từ filter, nếu không có thì lấy tất cả
-        $status = $request->status;
+        $booking = Booking::where('user_id', auth()->id())->findOrFail($id);
 
-        $bookings = \App\Models\Booking::where('user_id', auth()->id())
-            ->with('restaurant')
-            ->status($status) // Dùng scope đã tạo
-            ->latest()
-            ->get();
-
-        return view('bookings.history', compact('bookings', 'status'));
-    }
-    public function cancel(Request $request, $id)
-    {
-        // Tìm đơn hàng, bắt buộc phải là đơn của user đang đăng nhập
-        $booking = \App\Models\Booking::where('user_id', auth()->id())->findOrFail($id);
-
-        // Kiểm tra xem đơn đã bị hủy hoặc đã hoàn thành trước đó chưa
-        if ($booking->status === 'cancelled' || $booking->status === 'completed') {
-            return back()->with('error', 'Không thể thao tác. Đơn đặt bàn này đã chốt trạng thái.');
+        if (!in_array($booking->status, ['pending', 'confirmed'])) {
+            return back()->with('error', 'Không thể hủy đơn ở trạng thái hiện tại.');
         }
 
-        // Cập nhật trạng thái thành Đã hủy
-        $booking->status = 'cancelled';
-
-        // Nếu trong Database của em có tạo sẵn cột cancel_reason để lưu lý do hủy thì mở comment dòng dưới:
-        // $booking->cancel_reason = $request->cancel_reason;
-
-        $booking->save();
+        $booking->update(['status' => 'cancelled']);
 
         return back()->with('success', 'Đã hủy đơn đặt bàn thành công.');
     }

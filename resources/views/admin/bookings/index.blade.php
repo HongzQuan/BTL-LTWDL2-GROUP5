@@ -43,7 +43,7 @@
                     </div>
                     <div>
                         <p class="text-muted small mb-0">Chờ xác nhận</p>
-                        <h4 class="fw-bold mb-0 text-warning">{{ $statSummary['pending'] }}</h4>
+                        <h4 class="fw-bold mb-0 text-warning">{{ $statSummary['pending'] ?? 0 }}</h4>
                     </div>
                 </div>
             </div>
@@ -57,7 +57,7 @@
                     </div>
                     <div>
                         <p class="text-muted small mb-0">Đã xác nhận</p>
-                        <h4 class="fw-bold mb-0 text-primary">{{ $statSummary['confirmed'] }}</h4>
+                        <h4 class="fw-bold mb-0 text-primary">{{ $statSummary['confirmed'] ?? 0 }}</h4>
                     </div>
                 </div>
             </div>
@@ -71,7 +71,7 @@
                     </div>
                     <div>
                         <p class="text-muted small mb-0">Hoàn thành</p>
-                        <h4 class="fw-bold mb-0 text-success">{{ $statSummary['completed'] }}</h4>
+                        <h4 class="fw-bold mb-0 text-success">{{ $statSummary['completed'] ?? 0 }}</h4>
                     </div>
                 </div>
             </div>
@@ -85,7 +85,7 @@
                     </div>
                     <div>
                         <p class="text-muted small mb-0">Đã hủy</p>
-                        <h4 class="fw-bold mb-0 text-danger">{{ $statSummary['cancelled'] }}</h4>
+                        <h4 class="fw-bold mb-0 text-danger">{{ $statSummary['cancelled'] ?? 0 }}</h4>
                     </div>
                 </div>
             </div>
@@ -123,10 +123,10 @@
                         </label>
                         <select name="status" class="form-select form-select-sm">
                             <option value="">— Tất cả —</option>
-                            <option value="pending"   {{ request('status') === 'pending'    ? 'selected' : '' }}>Chờ xác nhận</option>
-                            <option value="confirmed" {{ request('status') === 'confirmed'  ? 'selected' : '' }}>Đã xác nhận</option>
-                            <option value="completed" {{ request('status') === 'completed'  ? 'selected' : '' }}>Hoàn thành</option>
-                            <option value="cancelled" {{ request('status') === 'cancelled'  ? 'selected' : '' }}>Đã hủy</option>
+                            <option value="pending"   {{ request('status') === 'pending'   ? 'selected' : '' }}>Chờ xác nhận</option>
+                            <option value="confirmed" {{ request('status') === 'confirmed' ? 'selected' : '' }}>Đã xác nhận</option>
+                            <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Hoàn thành</option>
+                            <option value="cancelled" {{ request('status') === 'cancelled' ? 'selected' : '' }}>Đã hủy</option>
                         </select>
                     </div>
 
@@ -161,7 +161,7 @@
                             <input type="text"
                                    name="q"
                                    class="form-control"
-                                   placeholder="Tên hoặc số điện thoại..."
+                                   placeholder="Tên hoặc SĐT..."
                                    value="{{ request('q') }}">
                             <button class="btn btn-primary" type="submit">
                                 <i class="bi bi-search"></i>
@@ -215,7 +215,7 @@
                             <th class="text-center" width="80">Số khách</th>
                             <th class="text-center" width="120">Trạng thái</th>
                             <th>Ngày tạo</th>
-                            <th class="text-center" width="160">Thao tác</th>
+                            <th class="text-center" width="120">Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -234,7 +234,7 @@
                             {{-- Tên khách --}}
                             <td>
                                 <div class="d-flex align-items-center gap-2">
-                                    <div class="avatar-sm rounded-circle bg-primary bg-opacity-10
+                                    <div class="avatar-sm rounded-circle bg-primary bg-opacity-10 
                                                 d-flex align-items-center justify-content-center"
                                          style="width:32px;height:32px;flex-shrink:0">
                                         <span class="text-primary fw-bold small">
@@ -280,7 +280,7 @@
 
                             {{-- Số khách --}}
                             <td class="text-center fw-bold text-secondary">
-                                {{ $booking->guests_count ?? 0 }}
+                                {{ $booking->guests ?? 0 }}
                             </td>
 
                             {{-- Trạng thái --}}
@@ -304,58 +304,51 @@
                             {{-- Thao tác --}}
                             <td class="text-center">
                                 <div class="d-flex justify-content-center gap-1">
+                                    
                                     @if($booking->status === 'pending')
-                                        {{-- Nút Xác nhận (Xanh) --}}
-                                        <form action="{{ route('admin.bookings.confirm', $booking->id) }}" method="POST" class="d-inline status-change-form" data-message="Bạn có chắc chắn muốn XÁC NHẬN đơn đặt bàn #{{ $booking->id }} này không?">
+                                        {{-- Nút Xác nhận (Đổi thành Primary - Xanh dương cho đồng bộ màu Card) --}}
+                                        <form action="{{ route('admin.bookings.confirm', $booking->id) }}" method="POST" class="d-inline status-change-form" data-message="XÁC NHẬN đơn đặt bàn #{{ $booking->id }}?">
                                             @csrf
                                             @method('PUT')
-                                            <button type="submit" class="btn btn-sm btn-success px-2 py-1" title="Xác nhận đơn">
-                                                <i class="bi bi-check-circle"></i>
+                                            <button type="submit" class="btn btn-sm btn-primary px-2 py-1" title="Xác nhận đơn">
+                                                <i class="bi bi-check-lg"></i>
                                             </button>
                                         </form>
 
                                         {{-- Nút Hủy (Đỏ) --}}
-                                        <form action="{{ route('admin.bookings.cancel', $booking->id) }}" method="POST" class="d-inline status-change-form" data-message="Bạn có chắc chắn muốn HỦY đơn đặt bàn #{{ $booking->id }} này không?">
+                                        <form action="{{ route('admin.bookings.cancel', $booking->id) }}" method="POST" class="d-inline status-change-form" data-message="Bạn muốn HỦY đơn đặt bàn #{{ $booking->id }}?">
                                             @csrf
                                             @method('PUT')
                                             <button type="submit" class="btn btn-sm btn-danger px-2 py-1" title="Hủy đơn">
-                                                <i class="bi bi-x-circle"></i>
+                                                <i class="bi bi-x-lg"></i>
                                             </button>
                                         </form>
 
                                     @elseif($booking->status === 'confirmed')
-                                        {{-- Nút Hoàn thành (Xám) --}}
+                                        {{-- Nút Hoàn thành (Đổi thành Success - Xanh lá cho đồng bộ màu Card) --}}
                                         @php
-                                            // Sửa logic lte(now) thay vì today() để tính cả giờ phút thực tế
-                                            $canComplete = $booking->booking_date && \Carbon\Carbon::parse($booking->booking_date)->lte(\Carbon\Carbon::now());
+                                            // Sử dụng isPast() của Carbon để check xem thời gian đặt đã qua hay chưa
+                                            $canComplete = $booking->booking_date && \Carbon\Carbon::parse($booking->booking_date)->isPast();
                                         @endphp
-                                        <form action="{{ route('admin.bookings.complete', $booking->id) }}" method="POST" class="d-inline status-change-form" data-message="Chuyển đơn đặt bàn #{{ $booking->id }} sang trạng thái HOÀN THÀNH?">
+                                        <form action="{{ route('admin.bookings.complete', $booking->id) }}" method="POST" class="d-inline status-change-form" data-message="Chuyển đơn #{{ $booking->id }} sang HOÀN THÀNH?">
                                             @csrf
                                             @method('PUT')
-                                            <button type="submit" class="btn btn-sm btn-secondary px-2 py-1" title="Hoàn thành đơn" {{ !$canComplete ? 'disabled' : '' }}>
-                                                <i class="bi bi-calendar2-check-fill"></i>
+                                            <button type="submit" class="btn btn-sm btn-success px-2 py-1" title="Hoàn thành đơn" {{ !$canComplete ? 'disabled' : '' }}>
+                                                <i class="bi bi-check2-all"></i>
                                             </button>
                                         </form>
 
                                         {{-- Nút Hủy (Đỏ) --}}
-                                        <form action="{{ route('admin.bookings.cancel', $booking->id) }}" method="POST" class="d-inline status-change-form" data-message="Bạn có chắc chắn muốn HỦY đơn đặt bàn #{{ $booking->id }} này không?">
+                                        <form action="{{ route('admin.bookings.cancel', $booking->id) }}" method="POST" class="d-inline status-change-form" data-message="Bạn muốn HỦY đơn đặt bàn #{{ $booking->id }}?">
                                             @csrf
                                             @method('PUT')
                                             <button type="submit" class="btn btn-sm btn-danger px-2 py-1" title="Hủy đơn">
-                                                <i class="bi bi-x-circle"></i>
+                                                <i class="bi bi-x-lg"></i>
                                             </button>
                                         </form>
 
-                                        {{-- Nút Hủy (Đỏ) --}}
-                                        <form action="{{ route('admin.bookings.cancel', $booking->id) }}" method="POST" class="d-inline status-change-form" data-message="Bạn có chắc chắn muốn HỦY đơn đặt bàn #{{ $booking->id }} này không?">
-                                            @csrf
-                                            @method('PUT')
-                                            <button type="submit" class="btn btn-sm btn-danger px-2 py-1" title="Hủy đơn">
-                                                <i class="bi bi-x-circle"></i>
-                                            </button>
-                                        </form>
                                     @else
-                                        {{-- Các status khác: chỉ hiện dấu gạch ngang nhẹ nhàng --}}
+                                        {{-- Các status khác: Hoàn thành hoặc Đã hủy --}}
                                         <span class="text-muted small">—</span>
                                     @endif
                                 </div>
@@ -365,7 +358,7 @@
                         <tr>
                             <td colspan="11" class="text-center py-5 text-muted">
                                 <i class="bi bi-calendar-x fs-2 d-block mb-2 text-secondary"></i>
-                                Không tìm thấy dữ liệu đặt bàn nào trùng khớp.
+                                Không tìm thấy dữ liệu đặt bàn nào.
                             </td>
                         </tr>
                         @endforelse
@@ -374,7 +367,7 @@
             </div>
         </div>
 
-        {{-- Thanh phân trang phía dưới bảng --}}
+        {{-- Thanh phân trang --}}
         @if($bookings->hasPages())
             <div class="card-footer bg-white py-3 border-top-0">
                 <div class="d-flex justify-content-center">
@@ -386,22 +379,20 @@
 </div>
 
 {{-- ════════════════════════════════════════════════════════════
-     JAVASCRIPT CONFIRM DIALOG BEFORE SUBMIT
+     JAVASCRIPT
 ════════════════════════════════════════════════════════════ --}}
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const forms = document.querySelectorAll('.status-change-form');
         forms.forEach(form => {
             form.addEventListener('submit', function (e) {
-                e.preventDefault(); // Chặn việc submit form ngay lập tức
-                const message = this.getAttribute('data-message') || "Bạn có chắc chắn muốn thực hiện thao tác này?";
-                
+                e.preventDefault();
+                const message = this.getAttribute('data-message') || "Bạn có chắc chắn?";
                 if (confirm(message)) {
-                    this.submit(); // Thực hiện submit form thực tế khi nhấn OK
+                    this.submit();
                 }
             });
         });
     });
 </script>
-
 @endsection

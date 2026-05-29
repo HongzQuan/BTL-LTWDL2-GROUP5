@@ -136,3 +136,5 @@ Route::get('/pump-reviews', function () {
 
 Route::get('/vnpay/return', [App\Http\Controllers\BookingController::class, 'vnpayReturn'])->name('vnpay.return');
 Route::post('/bookings/{id}/pay', [App\Http\Controllers\BookingController::class, 'createPayment'])->name('vnpay.payment');
+Route::patch('/admin/bookings/{id}/complete', [App\Http\Controllers\BookingController::class, 'markAsCompleted'])->name('admin.bookings.complete');
+Route::put('/admin/bookings/{id}/complete', [App\Http\Controllers\Admin\BookingController::class, 'complete'])->name('admin.bookings.complete');

@@ -18,16 +18,16 @@
          FLASH MESSAGES
     ════════════════════════════════════════════════════════════ --}}
     @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
     @endif
     @if(session('error'))
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
     @endif
 
     {{-- ════════════════════════════════════════════════════════════
@@ -108,10 +108,10 @@
                         <select name="restaurant_id" class="form-select form-select-sm">
                             <option value="">— Tất cả nhà hàng —</option>
                             @foreach($restaurants as $restaurant)
-                                <option value="{{ $restaurant->id }}"
-                                    {{ request('restaurant_id') == $restaurant->id ? 'selected' : '' }}>
-                                    {{ $restaurant->name }}
-                                </option>
+                            <option value="{{ $restaurant->id }}"
+                                {{ request('restaurant_id') == $restaurant->id ? 'selected' : '' }}>
+                                {{ $restaurant->name }}
+                            </option>
                             @endforeach
                         </select>
                     </div>
@@ -123,7 +123,7 @@
                         </label>
                         <select name="status" class="form-select form-select-sm">
                             <option value="">— Tất cả —</option>
-                            <option value="pending"   {{ request('status') === 'pending'   ? 'selected' : '' }}>Chờ xác nhận</option>
+                            <option value="pending" {{ request('status') === 'pending'   ? 'selected' : '' }}>Chờ xác nhận</option>
                             <option value="confirmed" {{ request('status') === 'confirmed' ? 'selected' : '' }}>Đã xác nhận</option>
                             <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Hoàn thành</option>
                             <option value="cancelled" {{ request('status') === 'cancelled' ? 'selected' : '' }}>Đã hủy</option>
@@ -136,9 +136,9 @@
                             <i class="bi bi-calendar-event me-1"></i>Từ ngày
                         </label>
                         <input type="date"
-                               name="date_from"
-                               class="form-control form-control-sm"
-                               value="{{ request('date_from') }}">
+                            name="date_from"
+                            class="form-control form-control-sm"
+                            value="{{ request('date_from') }}">
                     </div>
 
                     {{-- Date To --}}
@@ -147,9 +147,9 @@
                             <i class="bi bi-calendar-event me-1"></i>Đến ngày
                         </label>
                         <input type="date"
-                               name="date_to"
-                               class="form-control form-control-sm"
-                               value="{{ request('date_to') }}">
+                            name="date_to"
+                            class="form-control form-control-sm"
+                            value="{{ request('date_to') }}">
                     </div>
 
                     {{-- Tìm kiếm --}}
@@ -159,10 +159,10 @@
                         </label>
                         <div class="input-group input-group-sm">
                             <input type="text"
-                                   name="q"
-                                   class="form-control"
-                                   placeholder="Tên hoặc SĐT..."
-                                   value="{{ request('q') }}">
+                                name="q"
+                                class="form-control"
+                                placeholder="Tên hoặc SĐT..."
+                                value="{{ request('q') }}">
                             <button class="btn btn-primary" type="submit">
                                 <i class="bi bi-search"></i>
                             </button>
@@ -173,15 +173,15 @@
 
                 {{-- Reset --}}
                 @if(request()->hasAny(['restaurant_id','status','date_from','date_to','q']))
-                    <div class="mt-2">
-                        <a href="{{ route('admin.bookings.index') }}"
-                           class="btn btn-sm btn-outline-secondary">
-                            <i class="bi bi-x-circle me-1"></i>Xóa bộ lọc
-                        </a>
-                        <span class="text-muted small ms-2">
-                            Đang lọc — {{ $bookings->total() }} kết quả
-                        </span>
-                    </div>
+                <div class="mt-2">
+                    <a href="{{ route('admin.bookings.index') }}"
+                        class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-x-circle me-1"></i>Xóa bộ lọc
+                    </a>
+                    <span class="text-muted small ms-2">
+                        Đang lọc — {{ $bookings->total() }} kết quả
+                    </span>
+                </div>
                 @endif
             </form>
         </div>
@@ -236,7 +236,7 @@
                                 <div class="d-flex align-items-center gap-2">
                                     <div class="avatar-sm rounded-circle bg-primary bg-opacity-10 
                                                 d-flex align-items-center justify-content-center"
-                                         style="width:32px;height:32px;flex-shrink:0">
+                                        style="width:32px;height:32px;flex-shrink:0">
                                         <span class="text-primary fw-bold small">
                                             {{ strtoupper(substr($booking->user->name ?? 'K', 0, 1)) }}
                                         </span>
@@ -286,13 +286,13 @@
                             {{-- Trạng thái --}}
                             <td class="text-center">
                                 @if($booking->status === 'pending')
-                                    <span class="badge bg-warning text-dark px-2 py-1.5 small">Chờ xác nhận</span>
+                                <span class="badge bg-warning text-dark px-2 py-1.5 small">Chờ xác nhận</span>
                                 @elseif($booking->status === 'confirmed')
-                                    <span class="badge bg-primary px-2 py-1.5 small">Đã xác nhận</span>
+                                <span class="badge bg-primary px-2 py-1.5 small">Đã xác nhận</span>
                                 @elseif($booking->status === 'completed')
-                                    <span class="badge bg-success px-2 py-1.5 small">Hoàn thành</span>
+                                <span class="badge bg-success px-2 py-1.5 small">Hoàn thành</span>
                                 @elseif($booking->status === 'cancelled')
-                                    <span class="badge bg-danger px-2 py-1.5 small">Đã hủy</span>
+                                <span class="badge bg-danger px-2 py-1.5 small">Đã hủy</span>
                                 @endif
                             </td>
 
@@ -304,52 +304,57 @@
                             {{-- Thao tác --}}
                             <td class="text-center">
                                 <div class="d-flex justify-content-center gap-1">
-                                    
-                                    @if($booking->status === 'pending')
-                                        {{-- Nút Xác nhận (Đổi thành Primary - Xanh dương cho đồng bộ màu Card) --}}
-                                        <form action="{{ route('admin.bookings.confirm', $booking->id) }}" method="POST" class="d-inline status-change-form" data-message="XÁC NHẬN đơn đặt bàn #{{ $booking->id }}?">
-                                            @csrf
-                                            @method('PUT')
-                                            <button type="submit" class="btn btn-sm btn-primary px-2 py-1" title="Xác nhận đơn">
-                                                <i class="bi bi-check-lg"></i>
-                                            </button>
-                                        </form>
 
-                                        {{-- Nút Hủy (Đỏ) --}}
-                                        <form action="{{ route('admin.bookings.cancel', $booking->id) }}" method="POST" class="d-inline status-change-form" data-message="Bạn muốn HỦY đơn đặt bàn #{{ $booking->id }}?">
-                                            @csrf
-                                            @method('PUT')
-                                            <button type="submit" class="btn btn-sm btn-danger px-2 py-1" title="Hủy đơn">
-                                                <i class="bi bi-x-lg"></i>
-                                            </button>
-                                        </form>
+                                    @if($booking->status === 'pending')
+                                    {{-- Nút Xác nhận (Đổi thành Primary - Xanh dương cho đồng bộ màu Card) --}}
+                                    <form action="{{ route('admin.bookings.confirm', $booking->id) }}" method="POST" class="d-inline status-change-form" data-message="XÁC NHẬN đơn đặt bàn #{{ $booking->id }}?">
+                                        @csrf
+                                        @method('PUT')
+                                        <button type="submit" class="btn btn-sm btn-primary px-2 py-1" title="Xác nhận đơn">
+                                            <i class="bi bi-check-lg"></i>
+                                        </button>
+                                    </form>
+
+                                    {{-- Nút Hủy (Đỏ) --}}
+                                    <form action="{{ route('admin.bookings.cancel', $booking->id) }}" method="POST" class="d-inline status-change-form" data-message="Bạn muốn HỦY đơn đặt bàn #{{ $booking->id }}?">
+                                        @csrf
+                                        @method('PUT')
+                                        <button type="submit" class="btn btn-sm btn-danger px-2 py-1" title="Hủy đơn">
+                                            <i class="bi bi-x-lg"></i>
+                                        </button>
+                                    </form>
 
                                     @elseif($booking->status === 'confirmed')
-                                        {{-- Nút Hoàn thành (Đổi thành Success - Xanh lá cho đồng bộ màu Card) --}}
-                                        @php
-                                            // Sử dụng isPast() của Carbon để check xem thời gian đặt đã qua hay chưa
-                                            $canComplete = $booking->booking_date && \Carbon\Carbon::parse($booking->booking_date)->isPast();
-                                        @endphp
-                                        <form action="{{ route('admin.bookings.complete', $booking->id) }}" method="POST" class="d-inline status-change-form" data-message="Chuyển đơn #{{ $booking->id }} sang HOÀN THÀNH?">
-                                            @csrf
-                                            @method('PUT')
-                                            <button type="submit" class="btn btn-sm btn-success px-2 py-1" title="Hoàn thành đơn" {{ !$canComplete ? 'disabled' : '' }}>
-                                                <i class="bi bi-check2-all"></i>
-                                            </button>
-                                        </form>
+                                    {{-- Nút Hoàn thành (Đổi thành Success - Xanh lá cho đồng bộ màu Card) --}}
+                                    @php
+                                    $canComplete = false;
+                                    if ($booking->booking_date && $booking->booking_time) {
+                                    // Cắt bỏ phần 00:00:00, chỉ lấy ngày Y-m-d
+                                    $dateOnly = \Carbon\Carbon::parse($booking->booking_date)->format('Y-m-d');
+                                    // Nối Ngày và Giờ lại rồi check xem đã qua thời điểm hiện tại chưa
+                                    $canComplete = \Carbon\Carbon::parse($dateOnly . ' ' . $booking->booking_time)->isPast();
+                                    }
+                                    @endphp
+                                    <form action="{{ route('admin.bookings.complete', $booking->id) }}" method="POST" class="d-inline status-change-form" data-message="Chuyển đơn #{{ $booking->id }} sang HOÀN THÀNH?">
+                                        @csrf
+                                        @method('PUT')
+                                        <button type="submit" class="btn btn-sm btn-success px-2 py-1" title="Hoàn thành đơn" {{ !$canComplete ? 'disabled' : '' }}>
+                                            <i class="bi bi-check2-all"></i>
+                                        </button>
+                                    </form>
 
-                                        {{-- Nút Hủy (Đỏ) --}}
-                                        <form action="{{ route('admin.bookings.cancel', $booking->id) }}" method="POST" class="d-inline status-change-form" data-message="Bạn muốn HỦY đơn đặt bàn #{{ $booking->id }}?">
-                                            @csrf
-                                            @method('PUT')
-                                            <button type="submit" class="btn btn-sm btn-danger px-2 py-1" title="Hủy đơn">
-                                                <i class="bi bi-x-lg"></i>
-                                            </button>
-                                        </form>
+                                    {{-- Nút Hủy (Đỏ) --}}
+                                    <form action="{{ route('admin.bookings.cancel', $booking->id) }}" method="POST" class="d-inline status-change-form" data-message="Bạn muốn HỦY đơn đặt bàn #{{ $booking->id }}?">
+                                        @csrf
+                                        @method('PUT')
+                                        <button type="submit" class="btn btn-sm btn-danger px-2 py-1" title="Hủy đơn">
+                                            <i class="bi bi-x-lg"></i>
+                                        </button>
+                                    </form>
 
                                     @else
-                                        {{-- Các status khác: Hoàn thành hoặc Đã hủy --}}
-                                        <span class="text-muted small">—</span>
+                                    {{-- Các status khác: Hoàn thành hoặc Đã hủy --}}
+                                    <span class="text-muted small">—</span>
                                     @endif
                                 </div>
                             </td>
@@ -369,11 +374,11 @@
 
         {{-- Thanh phân trang --}}
         @if($bookings->hasPages())
-            <div class="card-footer bg-white py-3 border-top-0">
-                <div class="d-flex justify-content-center">
-                    {{ $bookings->links('pagination::bootstrap-5') }}
-                </div>
+        <div class="card-footer bg-white py-3 border-top-0">
+            <div class="d-flex justify-content-center">
+                {{ $bookings->links('pagination::bootstrap-5') }}
             </div>
+        </div>
         @endif
     </div>
 </div>
@@ -382,10 +387,10 @@
      JAVASCRIPT
 ════════════════════════════════════════════════════════════ --}}
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
         const forms = document.querySelectorAll('.status-change-form');
         forms.forEach(form => {
-            form.addEventListener('submit', function (e) {
+            form.addEventListener('submit', function(e) {
                 e.preventDefault();
                 const message = this.getAttribute('data-message') || "Bạn có chắc chắn?";
                 if (confirm(message)) {

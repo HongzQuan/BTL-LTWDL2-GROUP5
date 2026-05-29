@@ -1,5 +1,4 @@
 <?php
-// app/Http/Controllers/Admin/BookingController.php
 
 namespace App\Http\Controllers\Admin;
 
@@ -58,7 +57,7 @@ class BookingController extends Controller
             $keyword = '%' . $request->q . '%';
             $query->whereHas('user', function ($q) use ($keyword) {
                 $q->where('name', 'like', $keyword)
-                  ->orWhere('phone', 'like', $keyword);
+                    ->orWhere('phone', 'like', $keyword);
             });
         }
 
@@ -85,16 +84,21 @@ class BookingController extends Controller
                 ->with('error', 'Chỉ có thể xác nhận đơn đang chờ xử lý.');
         }
 
-        // ── Sửa lỗi 1 & 3: Kiểm tra khoảng thời gian xung đột (Ví dụ: cách nhau 2 tiếng) ──
+        // ── Fix logic: Gộp cả Ngày và Giờ để check xung đột chính xác ──
+        $dateOnly = Carbon::parse($booking->booking_date)->format('Y-m-d');
+        $bookingDateTime = Carbon::parse($dateOnly . ' ' . $booking->booking_time);
+
         // Đơn ăn kéo dài 2 tiếng: lùi 119 phút và tiến 119 phút quanh giờ hẹn đặt bàn
-        $bookingTime = Carbon::parse($booking->booking_date);
-        $startTime   = $bookingTime->copy()->subMinutes(119);
-        $endTime     = $bookingTime->copy()->addMinutes(119);
+        $startTime   = $bookingDateTime->copy()->subMinutes(119);
+        $endTime     = $bookingDateTime->copy()->addMinutes(119);
 
         $conflict = Booking::where('id', '!=', $booking->id)
             ->where('table_id', $booking->table_id)
             ->where('status', 'confirmed') // Chỉ check với đơn ĐÃ XÁC NHẬN thực tế
-            ->whereBetween('booking_date', [$startTime, $endTime])
+            ->where(function ($q) use ($startTime, $endTime) {
+                // Phải nối ngày và giờ trong DB để so sánh chính xác
+                $q->whereRaw("CONCAT(booking_date, ' ', booking_time) BETWEEN ? AND ?", [$startTime, $endTime]);
+            })
             ->exists();
 
         if ($conflict) {
@@ -143,12 +147,15 @@ class BookingController extends Controller
         // ── Guard 1: phải là confirmed ───────────────────────────────
         if ($booking->status !== 'confirmed') {
             return redirect()->route('admin.bookings.index')
-                ->with('error', 'Chỉ đơn đã xác nhận mới được đánh dấu hoàn thành.');
+                ->with('error', 'Chỉ đơn hàng Đã xác nhận mới có thể chuyển sang Hoàn thành.');
         }
 
-        // ── Sửa lỗi 2: So sánh chính xác đến giờ phút hiện tại ─────────
-        // Khách phải đến đúng giờ hẹn hoặc muộn hơn giờ hẹn (quá khứ) thì mới được bấm hoàn thành
-        if (Carbon::parse($booking->booking_date)->greaterThan(Carbon::now())) {
+        // ── Fix logic: So sánh chính xác đến giờ phút hiện tại ─────────
+        $dateOnly = Carbon::parse($booking->booking_date)->format('Y-m-d');
+        $bookingDateTime = Carbon::parse($dateOnly . ' ' . $booking->booking_time);
+
+        // Nếu thời gian hẹn ở TƯƠNG LAI (lớn hơn thời gian thực tế hiện tại)
+        if ($bookingDateTime->greaterThan(Carbon::now())) {
             return redirect()->route('admin.bookings.index')
                 ->with('error', 'Chưa đến giờ hẹn đặt bàn thực tế của khách, không thể hoàn thành sớm.');
         }
@@ -159,6 +166,6 @@ class BookingController extends Controller
         });
 
         return redirect()->route('admin.bookings.index')
-            ->with('success', "Đơn đặt bàn #$booking->id đã được đánh dấu hoàn thành.");
+            ->with('success', 'Tuyệt vời! Đã cập nhật trạng thái khách dùng bữa thành công. Khách hàng giờ đây có thể đánh giá nhà hàng.');
     }
 }

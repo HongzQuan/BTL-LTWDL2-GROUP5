@@ -274,7 +274,8 @@
                                 </div>
                                 <div class="text-muted text-xs">
                                     <i class="bi bi-clock me-1"></i>
-                                    {{ $booking->booking_date ? \Carbon\Carbon::parse($booking->booking_date)->format('H:i') : '—' }}
+                                    {{-- ĐÃ SỬA: Lấy từ $booking->booking_time thay vì $booking->booking_date --}}
+                                    {{ $booking->booking_time ? \Carbon\Carbon::parse($booking->booking_time)->format('H:i') : '—' }}
                                 </div>
                             </td>
 

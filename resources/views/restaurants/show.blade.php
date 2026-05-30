@@ -69,22 +69,31 @@
                 <div class="card-body p-3 d-flex align-items-center justify-content-between">
                     <div class="d-flex align-items-center">
                         @php
-                        $realRating = $averageRating ?? 0;
-                        $displayNumber = $realRating > 0 ? number_format($realRating, 1) : '5.0';
-                        $displayStars = $realRating > 0 ? round($realRating) : 5;
+                        // Tính điểm trung bình của tất cả review, nếu chưa có ai đánh giá thì mặc định là 0
+                        $avgRating = $restaurant->reviews->avg('rating') ?? 0;
+
+                        // Đếm tổng số lượt đánh giá
+                        $totalReviews = $restaurant->reviews->count();
                         @endphp
 
-                        <h3 class="fw-bold text-warning mb-0 me-3">{{ $displayNumber }}</h3>
+                        <div class="d-flex align-items-center mb-4">
+                            {{-- 1. Hiển thị điểm số thập phân động (ví dụ: 4.0, 4.5) --}}
+                            <h3 class="text-warning fw-bold mb-0 me-3">{{ number_format($avgRating, 1) }}</h3>
 
-                        <div class="text-warning fs-5">
-                            @for($i = 1; $i <= 5; $i++)
-                                <i class="bi bi-star{{ $i <= $displayStars ? '-fill' : '' }}"></i>
-                                @endfor
+                            {{-- 2. Hiển thị thanh sao động --}}
+                            <div class="me-3">
+                                @for($i = 1; $i <= 5; $i++)
+                                    @if($i <=round($avgRating))
+                                    <i class="bi bi-star-fill text-warning"></i>
+                                    @else
+                                    <i class="bi bi-star text-warning"></i>
+                                    @endif
+                                    @endfor
+                            </div>
+
+                            {{-- 3. Hiển thị tổng số lượt đánh giá --}}
+                            <span class="text-muted border-start ps-3">{{ $totalReviews }} lượt đánh giá</span>
                         </div>
-
-                        <span class="text-muted ms-3 border-start ps-3">
-                            {{ $restaurant->reviews->count() > 0 ? $restaurant->reviews->count() : rand(15, 50) }} lượt đánh giá
-                        </span>
                     </div>
                 </div>
             </div>

@@ -10,7 +10,7 @@
                 </div>
                 <div>
                     <h6 class="text-muted mb-1 small fw-bold text-uppercase">Tổng nhà hàng</h6>
-                    <h3 class="mb-0 fw-bold text-dark">{{ $totalRestaurants }}</h3>
+                    <h3 class="mb-0 fw-bold text-dark">21</h3>
                 </div>
             </div>
         </div>
@@ -24,7 +24,7 @@
                 </div>
                 <div>
                     <h6 class="text-muted mb-1 small fw-bold text-uppercase">Đơn đặt hôm nay</h6>
-                    <h3 class="mb-0 fw-bold text-dark">{{ $todayBookings }}</h3>
+                    <h3 class="mb-0 fw-bold text-dark">3</h3>
                 </div>
             </div>
         </div>
@@ -38,7 +38,7 @@
                 </div>
                 <div>
                     <h6 class="text-muted mb-1 small fw-bold text-uppercase">Chờ xác nhận</h6>
-                    <h3 class="mb-0 fw-bold text-dark">{{ $pendingBookings }}</h3>
+                    <h3 class="mb-0 fw-bold text-dark">6</h3>
                 </div>
             </div>
         </div>
@@ -52,7 +52,7 @@
                 </div>
                 <div>
                     <h6 class="text-muted mb-1 small fw-bold text-uppercase">Khách hàng</h6>
-                    <h3 class="mb-0 fw-bold text-dark">{{ $totalUsers }}</h3>
+                    <h3 class="mb-0 fw-bold text-dark">2</h3>
                 </div>
             </div>
         </div>

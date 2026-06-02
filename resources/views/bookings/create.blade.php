@@ -234,7 +234,7 @@
 
                         {{-- Submit --}}
                         <div class="d-grid gap-2 d-sm-flex justify-content-sm-between align-items-center">
-                            <a href="{{ route('restaurants.show', $restaurant->slug) }}"
+                            <a href="javascript:history.back()"
                                 class="btn btn-outline-secondary">
                                 <i class="bi bi-arrow-left me-1"></i>
                                 Quay lại

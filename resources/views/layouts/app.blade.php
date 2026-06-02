@@ -4,14 +4,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Restaurant Booking - Khám phá ẩm thực</title>
+    <link rel="icon" href="{{ asset('favicon.png') }}" type="image/png">
+    <title>TableGo - Nền tảng đặt bàn nhà hàng thông minh</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <style>
         body {
             background-color: #f8f9fa;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        html {
             scroll-behavior: smooth;
+            scroll-padding-top: 100px;
         }
 
         .text-danger-pasgo {
@@ -42,7 +47,7 @@
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top py-3">
         <div class="container">
             <a class="navbar-brand fw-bold text-danger-pasgo fs-4 fst-italic" href="/">
-                <i class="bi bi-shop"></i> RestaurantBooking
+                <i class="bi bi-shop"></i> TableGo
             </a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -54,7 +59,7 @@
                     <li class="nav-item"><a class="nav-link text-dark px-3" href="/">Trang chủ</a></li>
                     <li class="nav-item"><a class="nav-link text-dark px-3" href="/restaurants">Danh sách nhà hàng</a></li>
                     <li class="nav-item"><a class="nav-link text-dark px-3" href="#collections">Bộ sưu tập</a></li>
-                    <li class="nav-item"><a class="nav-link text-dark px-3" href="#">Tin tức & Blog</a></li>
+                    <li class="nav-item"><a class="nav-link text-dark px-3" href="#blog">Tin tức & Blog</a></li>
                 </ul>
 
                 <div class="d-flex align-items-center gap-4">
@@ -105,7 +110,7 @@
             <div class="row g-4 mb-5">
                 <div class="col-lg-3 col-md-6">
                     <h5 class="fw-bold mb-3 text-dark">Đặt chỗ & Ưu đãi</h5>
-                    <p class="text-muted small lh-lg mb-0">RestaurantBooking là nền tảng đặt chỗ trực tuyến, giúp thực khách tìm kiếm và lựa chọn nhà hàng đúng ý gần nhất. Với các đối tác nhà hàng sẽ dễ dàng và hiệu quả hơn để tăng doanh số, hiệu suất bán hàng!</p>
+                    <p class="text-muted small lh-lg mb-0">TableGo là nền tảng đặt chỗ trực tuyến, giúp thực khách tìm kiếm và lựa chọn nhà hàng đúng ý gần nhất. Với các đối tác nhà hàng sẽ dễ dàng và hiệu quả hơn để tăng doanh số, hiệu suất bán hàng!</p>
                 </div>
                 <div class="col-lg-2 col-md-6">
                     <h5 class="fw-bold mb-3 text-dark">Giới thiệu</h5>
@@ -136,10 +141,10 @@
             <div class="row pt-4 border-top">
                 <div class="col-lg-8">
                     <h6 class="fw-bold text-dark text-uppercase mb-3">Thông tin doanh nghiệp</h6>
-                    <p class="text-muted small mb-1"><strong>Địa chỉ:</strong> Tòa nhà FPT Polytechnic, Phố Trịnh Văn Bô, Nam Từ Liêm, Hà Nội</p>
-                    <p class="text-muted small mb-1"><strong>Hotline:</strong> 1900.xxxx.xxx | <strong>Email:</strong> cskh@restaurantbooking.vn</p>
+                    <p class="text-muted small mb-1"><strong>Địa chỉ:</strong> Đại học Phenikaa</p>
+                    <p class="text-muted small mb-1"><strong>Hotline:</strong> 1900.xxxx.xxx | <strong>Email:</strong> cskh@TableGo.vn</p>
                     <p class="text-muted small mb-3"><strong>Mã số thuế:</strong> 0123456789</p>
-                    <p class="text-muted small mb-3">© Copyright 2026 RestaurantBooking. All rights reserved.</p>
+                    <p class="text-muted small mb-3">© Copyright 2026 TableGo. All rights reserved.</p>
                     <button class="btn btn-outline-danger btn-sm rounded-pill fw-semibold px-4"><i class="bi bi-send me-1"></i> Gửi góp ý</button>
                 </div>
                 <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
@@ -152,6 +157,7 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 
 </html>

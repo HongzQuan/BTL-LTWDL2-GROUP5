@@ -29,7 +29,7 @@ class BookingController extends Controller
         $time         = $request->input('time');
         $guests       = $request->integer('guests');
 
-        // CHỐT CHẶN 1: Kiểm tra nếu ngày giờ chọn ở trang chi tiết đã trôi qua
+        // CHỐT CHẶN 1: Kiểm tra nếu ngày giờ chọn đã trôi qua
         $bookingDateTime = Carbon::parse($date . ' ' . $time);
         if ($bookingDateTime->isPast()) {
             return redirect()->back()
@@ -38,11 +38,26 @@ class BookingController extends Controller
 
         $restaurant = Restaurant::findOrFail($restaurantId);
 
+        // CHỐT CHẶN 2: Kiểm tra giờ mở/đóng cửa ngay từ vòng gửi xe
+        $bookingTimeStr = strtotime($time);
+        $openTimeStr = strtotime($restaurant->open_time);
+        $closeTimeStr = strtotime($restaurant->close_time);
+
+        if ($bookingTimeStr < $openTimeStr || $bookingTimeStr > $closeTimeStr) {
+            return redirect()->back()
+                ->with('error', "Rất tiếc! Nhà hàng chỉ mở cửa từ {$restaurant->open_time} đến {$restaurant->close_time}. Vui lòng chọn giờ khác.");
+        }
+
+        // CHỐT CHẶN 3: Lọc bàn trống (cách nhau 2 tiếng) ở bước hiển thị form
+        $requestedTime = Carbon::parse($time);
+        $startTime = $requestedTime->copy()->subMinutes(119)->format('H:i:s');
+        $endTime   = $requestedTime->copy()->addMinutes(119)->format('H:i:s');
+
         $availableTables = Table::where('restaurant_id', $restaurantId)
             ->where('capacity', '>=', $guests)
-            ->whereDoesntHave('bookings', function ($query) use ($date, $time) {
+            ->whereDoesntHave('bookings', function ($query) use ($date, $startTime, $endTime) {
                 $query->where('booking_date', $date)
-                    ->where('booking_time', $time)
+                    ->whereBetween('booking_time', [$startTime, $endTime])
                     ->whereIn('status', ['pending', 'confirmed']);
             })
             ->orderBy('capacity')
@@ -56,7 +71,7 @@ class BookingController extends Controller
      */
     public function store(Request $request)
     {
-        // CHỐT CHẶN 2: Kiểm tra một lần nữa trước khi ghi dữ liệu vào Database để chống hack form
+        // Kiểm tra một lần nữa trước khi ghi dữ liệu vào Database để chống hack form
         if ($request->filled(['booking_date', 'booking_time'])) {
             $bookingDateTime = Carbon::parse($request->booking_date . ' ' . $request->booking_time);
 
@@ -76,20 +91,37 @@ class BookingController extends Controller
             'note'          => ['nullable', 'string', 'max:500'],
         ]);
 
+        // KIỂM TRA LẠI GIỜ MỞ/ĐÓNG CỬA CỦA NHÀ HÀNG KHI LƯU
+        $restaurant = Restaurant::findOrFail($validated['restaurant_id']);
+        $bookingTimeStr = strtotime($validated['booking_time']);
+        $openTimeStr = strtotime($restaurant->open_time);
+        $closeTimeStr = strtotime($restaurant->close_time);
+
+        if ($bookingTimeStr < $openTimeStr || $bookingTimeStr > $closeTimeStr) {
+            return back()
+                ->with('error', "Rất tiếc! Nhà hàng chỉ mở cửa từ {$restaurant->open_time} đến {$restaurant->close_time}. Vui lòng chọn giờ khác.")
+                ->withInput();
+        }
+
         $booking = DB::transaction(function () use ($validated) {
             $table = Table::where('id', $validated['table_id'])
                 ->where('restaurant_id', $validated['restaurant_id'])
                 ->lockForUpdate()
                 ->firstOrFail();
 
+            // CHỐT CHẶN 4: Kiểm tra lại khoảng cách 2 tiếng trước khi lưu Database
+            $requestedTimeStore = Carbon::parse($validated['booking_time']);
+            $startTimeStore = $requestedTimeStore->copy()->subMinutes(119)->format('H:i:s');
+            $endTimeStore   = $requestedTimeStore->copy()->addMinutes(119)->format('H:i:s');
+
             $isBooked = Booking::where('table_id', $table->id)
                 ->where('booking_date', $validated['booking_date'])
-                ->where('booking_time', $validated['booking_time'])
+                ->whereBetween('booking_time', [$startTimeStore, $endTimeStore])
                 ->whereIn('status', ['pending', 'confirmed'])
                 ->exists();
 
             if ($isBooked) {
-                throw ValidationException::withMessages(['table_id' => 'Bàn này vừa được đặt bởi người khác.']);
+                throw ValidationException::withMessages(['table_id' => 'Bàn này đã có khách đặt. Các ca đặt bàn phải cách nhau ít nhất 2 tiếng!']);
             }
 
             if ($table->capacity < $validated['guests']) {
@@ -155,6 +187,7 @@ class BookingController extends Controller
 
         return back()->with('success', 'Đã hủy đơn đặt bàn thành công.');
     }
+
     public function vnpayReturn(Request $request)
     {
         $vnp_HashSecret = env('VNP_HASH_SECRET');
@@ -224,12 +257,12 @@ class BookingController extends Controller
         $vnp_TmnCode = env('VNP_TMN_CODE');
         $vnp_HashSecret = env('VNP_HASH_SECRET');
 
-        $vnp_TxnRef = $booking->id; 
+        $vnp_TxnRef = $booking->id;
         $vnp_OrderInfo = "Thanh toan tien coc dat ban don hang " . $booking->id;
         $vnp_OrderType = 'billpayment';
-        $vnp_Amount = 200000 * 100; 
+        $vnp_Amount = 200000 * 100;
         $vnp_Locale = 'vn';
-        $vnp_BankCode = 'NCB'; 
+        $vnp_BankCode = 'NCB';
         $vnp_IpAddr = $_SERVER['REMOTE_ADDR'];
 
         $inputData = array(

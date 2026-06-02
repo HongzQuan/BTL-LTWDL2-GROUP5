@@ -237,7 +237,7 @@
             </a>
         </div>
     </div>
-    <div class="container my-5 pt-5 border-top">
+    <div class="container my-5 pt-5 border-top" id="blog">
         <div class="d-flex justify-content-between align-items-end mb-4">
             <div>
                 <h3 class="fw-bold mb-1">Cẩm nang ẩm thực</h3>

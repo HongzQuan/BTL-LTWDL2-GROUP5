@@ -64,7 +64,7 @@ class AuthController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'phone' => 'nullable|string|max:20',
+            'phone' => 'required|numeric|digits:10',
             'password' => 'required|string|min:6|confirmed', // Cần field password_confirmation ở form
         ]);
 

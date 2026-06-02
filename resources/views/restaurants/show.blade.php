@@ -294,6 +294,11 @@
                         </div>
 
                         <div class="mb-4">
+                            @if (session('error'))
+                            <div class="alert alert-danger" style="color: red; margin-bottom: 15px;">
+                                {{ session('error') }}
+                            </div>
+                            @endif
                             <label class="form-label text-muted small mb-1"><i class="bi bi-calendar3 me-1"></i> Thời gian đến</label>
                             <div class="d-flex gap-2">
                                 <input type="date" name="date" id="booking_date" class="form-control" value="{{ date('Y-m-d') }}" min="{{ date('Y-m-d') }}" required>

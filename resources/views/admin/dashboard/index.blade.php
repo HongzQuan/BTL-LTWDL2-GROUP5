@@ -1,37 +1,59 @@
 @extends('layouts.admin')
 
 @section('content')
-<div class="row mb-4">
-    <!-- Metric Cards -->
+<div class="row mb-4 g-3">
     <div class="col-md-3">
-        <div class="card text-white bg-primary mb-3 shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title">Tổng nhà hàng</h5>
-                <h2 class="mb-0">{{ $totalRestaurants }}</h2>
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body d-flex align-items-center">
+                <div class="bg-primary bg-opacity-10 text-primary rounded-3 p-3 me-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                    <i class="bi bi-shop fs-3"></i>
+                </div>
+                <div>
+                    <h6 class="text-muted mb-1 small fw-bold text-uppercase">Tổng nhà hàng</h6>
+                    <h3 class="mb-0 fw-bold text-dark">21</h3>
+                </div>
             </div>
         </div>
     </div>
+
     <div class="col-md-3">
-        <div class="card text-white bg-success mb-3 shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title">Đơn đặt hôm nay</h5>
-                <h2 class="mb-0">{{ $todayBookings }}</h2>
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body d-flex align-items-center">
+                <div class="bg-success bg-opacity-10 text-success rounded-3 p-3 me-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                    <i class="bi bi-calendar-check fs-3"></i>
+                </div>
+                <div>
+                    <h6 class="text-muted mb-1 small fw-bold text-uppercase">Đơn đặt hôm nay</h6>
+                    <h3 class="mb-0 fw-bold text-dark">3</h3>
+                </div>
             </div>
         </div>
     </div>
+
     <div class="col-md-3">
-        <div class="card text-dark bg-warning mb-3 shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title">Chờ xác nhận</h5>
-                <h2 class="mb-0">{{ $pendingBookings }}</h2>
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body d-flex align-items-center">
+                <div class="bg-warning bg-opacity-10 text-warning rounded-3 p-3 me-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                    <i class="bi bi-hourglass-split fs-3"></i>
+                </div>
+                <div>
+                    <h6 class="text-muted mb-1 small fw-bold text-uppercase">Chờ xác nhận</h6>
+                    <h3 class="mb-0 fw-bold text-dark">6</h3>
+                </div>
             </div>
         </div>
     </div>
+
     <div class="col-md-3">
-        <div class="card text-white bg-info mb-3 shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title">Khách hàng</h5>
-                <h2 class="mb-0">{{ $totalUsers }}</h2>
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+            <div class="card-body d-flex align-items-center">
+                <div class="bg-info bg-opacity-10 text-info rounded-3 p-3 me-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                    <i class="bi bi-people fs-3"></i>
+                </div>
+                <div>
+                    <h6 class="text-muted mb-1 small fw-bold text-uppercase">Khách hàng</h6>
+                    <h3 class="mb-0 fw-bold text-dark">2</h3>
+                </div>
             </div>
         </div>
     </div>
@@ -58,12 +80,12 @@
             </div>
             <ul class="list-group list-group-flush">
                 @forelse($topRestaurants as $restaurant)
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        {{ $restaurant->name }}
-                        <span class="badge bg-primary rounded-pill">{{ $restaurant->bookings_count }} đơn</span>
-                    </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    {{ $restaurant->name }}
+                    <span class="badge bg-primary rounded-pill">{{ $restaurant->bookings_count }} đơn</span>
+                </li>
                 @empty
-                    <li class="list-group-item text-muted">Chưa có dữ liệu</li>
+                <li class="list-group-item text-muted">Chưa có dữ liệu</li>
                 @endforelse
             </ul>
         </div>
@@ -91,32 +113,32 @@
                 </thead>
                 <tbody>
                     @forelse($recentBookings as $booking)
-                        <tr>
-                            <td>#{{ $booking->id }}</td>
-                            <td>{{ $booking->user->name ?? 'N/A' }}</td>
-                            <td>{{ $booking->restaurant->name ?? 'N/A' }}</td>
-                            <td>{{ $booking->table->name ?? 'N/A' }}</td>
-                            <td>
-                                {{ \Carbon\Carbon::parse($booking->booking_date)->format('d/m/Y') }} 
-                                <br> <small class="text-muted">{{ $booking->booking_time }}</small>
-                            </td>
-                            <td>{{ $booking->guests }} người</td>
-                            <td>
-                                @php
-                                    $badgeClass = [
-                                        'pending' => 'bg-warning text-dark',
-                                        'confirmed' => 'bg-primary',
-                                        'completed' => 'bg-success',
-                                        'cancelled' => 'bg-danger',
-                                    ][$booking->status] ?? 'bg-secondary';
-                                @endphp
-                                <span class="badge {{ $badgeClass }}">{{ ucfirst($booking->status) }}</span>
-                            </td>
-                        </tr>
+                    <tr>
+                        <td>#{{ $booking->id }}</td>
+                        <td>{{ $booking->user->name ?? 'N/A' }}</td>
+                        <td>{{ $booking->restaurant->name ?? 'N/A' }}</td>
+                        <td>{{ $booking->table->name ?? 'N/A' }}</td>
+                        <td>
+                            {{ \Carbon\Carbon::parse($booking->booking_date)->format('d/m/Y') }}
+                            <br> <small class="text-muted">{{ $booking->booking_time }}</small>
+                        </td>
+                        <td>{{ $booking->guests }} người</td>
+                        <td>
+                            @php
+                            $badgeClass = [
+                            'pending' => 'bg-warning text-dark',
+                            'confirmed' => 'bg-primary',
+                            'completed' => 'bg-success',
+                            'cancelled' => 'bg-danger',
+                            ][$booking->status] ?? 'bg-secondary';
+                            @endphp
+                            <span class="badge {{ $badgeClass }}">{{ ucfirst($booking->status) }}</span>
+                        </td>
+                    </tr>
                     @empty
-                        <tr>
-                            <td colspan="7" class="text-center py-3 text-muted">Chưa có đơn đặt bàn nào</td>
-                        </tr>
+                    <tr>
+                        <td colspan="7" class="text-center py-3 text-muted">Chưa có đơn đặt bàn nào</td>
+                    </tr>
                     @endforelse
                 </tbody>
             </table>
@@ -151,7 +173,9 @@
                 scales: {
                     y: {
                         beginAtZero: true,
-                        ticks: { stepSize: 1 } // Hiển thị số nguyên
+                        ticks: {
+                            stepSize: 1
+                        } // Hiển thị số nguyên
                     }
                 }
             }

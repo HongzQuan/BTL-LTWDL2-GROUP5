@@ -276,12 +276,25 @@
 
                 </div>
             </div>
-            {{-- HIỂN THỊ NÚT THANH TOÁN KHI ĐƠN ĐANG CHỜ XÁC NHẬN --}}
+            {{-- KIỂM TRA XEM CÓ PHẢI BÀN VIP HAY KHÔNG --}}
+            @php
+            // Kiểm tra nếu trong tên bàn có chữ 'VIP' (không phân biệt chữ hoa chữ thường)
+            $isVipTable = \Illuminate\Support\Str::contains(strtolower($booking->table->name ?? ''), 'vip');
+            @endphp
+
+            {{-- NẾU ĐƠN HÀNG ĐANG CHỜ XÁC NHẬN --}}
             @if($booking->status == 'pending')
+
+            @if($isVipTable)
+            {{-- THỨ 1: NẾU LÀ BÀN VIP -> BẮT BUỘC HIỂN THỊ KHU VỰC THANH TOÁN VNPAY --}}
             <div class="card border-primary mb-4 shadow-sm">
                 <div class="card-body text-center p-4">
-                    <h5 class="card-title text-primary fw-bold mb-2">Thanh toán tiền cọc</h5>
-                    <p class="small text-muted mb-4">Vui lòng thanh toán cọc <strong>200.000đ</strong> để nhà hàng giữ chỗ cho bạn.</p>
+                    <h5 class="card-title text-primary fw-bold mb-2">
+                        <i class="bi bi-gem me-1"></i> Thanh toán tiền cọc Bàn VIP
+                    </h5>
+                    <p class="small text-muted mb-4">
+                        Bạn đã chọn đặt <strong>{{ $booking->table->name }}</strong>. Vui lòng thanh toán cọc <strong>200.000đ</strong> qua VNPAY để hệ thống tự động khóa giữ chỗ VIP này nhé.
+                    </p>
 
                     <form action="{{ route('vnpay.payment', $booking->id) }}" method="POST">
                         @csrf
@@ -291,6 +304,22 @@
                     </form>
                 </div>
             </div>
+            @else
+            {{-- THỨ 2: NẾU LÀ BÀN THƯỜNG -> KHÔNG HIỆN NÚT VNPAY, HIỆN THÔNG BÁO MIỄN PHÍ --}}
+            <div class="alert alert-info border-0 shadow-sm mb-4 p-4">
+                <div class="d-flex align-items-center">
+                    <i class="bi bi-info-circle-fill fs-2 text-info me-3"></i>
+                    <div>
+                        <h5 class="alert-heading mb-1 fw-bold text-info">Đặt chỗ bàn thường thành công!</h5>
+                        <p class="mb-0 text-dark small">
+                            Bạn đã chọn <strong>{{ $booking->table->name }}</strong>. Loại bàn này <strong>không cần đặt cọc trước</strong>. <br>
+                            Yêu cầu đặt bàn của bạn đã được gửi đến hệ thống quản lý của nhà hàng. Vui lòng đợi Admin duyệt đơn và đến đúng giờ hẹn nhé!
+                        </p>
+                    </div>
+                </div>
+            </div>
+            @endif
+
             @endif
             {{-- HIỂN THỊ KHI ĐÃ THANH TOÁN THÀNH CÔNG --}}
             @if($booking->status == 'confirmed')

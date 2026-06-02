@@ -87,16 +87,18 @@
                             <i class="bi bi-calendar-event me-1"></i> {{ date('d/m/Y', strtotime($booking->booking_date)) }}
                             <i class="bi bi-clock ms-2 me-1"></i> {{ $booking->booking_time }}
                         </div>
-                        <span class="badge 
-    @if($booking->status == 'pending') bg-warning text-dark
-    @elseif($booking->status == 'confirmed') bg-success
-    @elseif($booking->status == 'cancelled') bg-danger
-    @endif">
-
-                            @if($booking->status == 'pending') Chờ xử lý
-                            @elseif($booking->status == 'confirmed') Đã xác nhận
-                            @elseif($booking->status == 'cancelled') Đã hủy
-                            @endif
+                        <span class="badge"> 
+                        @if($booking->status === 'pending')
+                        <span class=" badge bg-warning text-dark px-2 py-1">Chờ xử lý</span>
+                        @elseif($booking->status === 'confirmed')
+                        <span class="badge bg-primary px-2 py-1">Đã xác nhận</span>
+                        @elseif($booking->status === 'completed')
+                        <span class="badge bg-success px-2 py-1">Đã hoàn thành</span>
+                        @elseif($booking->status === 'cancelled')
+                        <span class="badge bg-danger px-2 py-1">Đã hủy</span>
+                        @else
+                        <span class="badge bg-secondary px-2 py-1">Không rõ</span>
+                        @endif
                         </span>
                     </div>
                     @endforeach

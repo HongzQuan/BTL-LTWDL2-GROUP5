@@ -29,8 +29,9 @@ class BookingController extends Controller
         ];
 
         // ── Query chính ─────────────────────────────────────────────
+        // ĐÃ FIX LỖI SỐ 1: Sắp xếp theo ID giảm dần để mã đơn mới nhất luôn nằm trên cùng
         $query = Booking::with(['user', 'restaurant', 'table'])
-            ->orderBy('booking_date', 'desc');
+            ->orderBy('id', 'desc');
 
         // Filter: restaurant_id
         if ($request->filled('restaurant_id')) {

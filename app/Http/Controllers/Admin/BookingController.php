@@ -29,36 +29,51 @@ class BookingController extends Controller
         ];
 
         // ── Query chính ─────────────────────────────────────────────
-        // ĐÃ FIX LỖI SỐ 1: Sắp xếp theo ID giảm dần để mã đơn mới nhất luôn nằm trên cùng
         $query = Booking::with(['user', 'restaurant', 'table'])
             ->orderBy('id', 'desc');
 
-        // Filter: restaurant_id
-        if ($request->filled('restaurant_id')) {
+        // 1. Filter: restaurant_id (Loại trừ rỗng hoặc chữ 'all')
+        if ($request->filled('restaurant_id') && $request->restaurant_id !== 'all') {
             $query->where('restaurant_id', $request->restaurant_id);
         }
 
-        // Filter: status
-        if ($request->filled('status')) {
+        // 2. Filter: status (Loại trừ rỗng hoặc chữ 'all')
+        if ($request->filled('status') && $request->status !== 'all') {
             $query->where('status', $request->status);
         }
 
-        // Filter: date_from
+        // 3. Filter: date_from (Parse định dạng ngày an toàn)
         if ($request->filled('date_from')) {
-            $query->whereDate('booking_date', '>=', $request->date_from);
+            try {
+                $dateFrom = Carbon::parse(str_replace('/', '-', $request->date_from))->format('Y-m-d');
+                $query->whereDate('booking_date', '>=', $dateFrom);
+            } catch (\Exception $e) {
+            }
         }
 
-        // Filter: date_to
+        // 4. Filter: date_to (Parse định dạng ngày an toàn)
         if ($request->filled('date_to')) {
-            $query->whereDate('booking_date', '<=', $request->date_to);
+            try {
+                $dateTo = Carbon::parse(str_replace('/', '-', $request->date_to))->format('Y-m-d');
+                $query->whereDate('booking_date', '<=', $dateTo);
+            } catch (\Exception $e) {
+            }
         }
 
-        // Filter: q — tìm theo tên user hoặc SĐT
+        // 5. Filter: q — Tìm theo Mã đơn, tên user hoặc SĐT
         if ($request->filled('q')) {
             $keyword = '%' . $request->q . '%';
-            $query->whereHas('user', function ($q) use ($keyword) {
-                $q->where('name', 'like', $keyword)
-                    ->orWhere('phone', 'like', $keyword);
+            $query->where(function ($subQuery) use ($keyword, $request) {
+                // Ưu tiên tìm chính xác theo Mã đơn hàng nếu admin gõ số
+                if (is_numeric($request->q)) {
+                    $subQuery->where('id', $request->q);
+                }
+
+                // Kèm theo tìm trong bảng user (tên, SĐT)
+                $subQuery->orWhereHas('user', function ($q) use ($keyword) {
+                    $q->where('name', 'like', $keyword)
+                        ->orWhere('phone', 'like', $keyword);
+                });
             });
         }
 

@@ -15,7 +15,7 @@ class RestaurantController extends Controller
     public function index(Request $request)
     {
         // Khởi tạo query với scopeActive và Eager Loading category
-        // Sử dụng withAvg để tính trung bình rating ngay từ database, giúp việc sort chính xác và tối ưu hơn
+        // Sử dụng withAvg để tính trung bình rating ngay từ database
         $query = Restaurant::active()->with('category')->withAvg('reviews', 'rating');
 
         // 1. Lọc theo Thành phố (City)
@@ -28,12 +28,12 @@ class RestaurantController extends Controller
             $query->where('category_id', $request->category_id);
         }
 
-        // 3. Lọc theo Khoảng giá (Giả định price_range lưu số tiền, vd: 500000)
+        // 3. Lọc theo Khoảng giá (Đã sửa lại đúng cột price_min và price_max)
         if ($request->filled('price_min')) {
-            $query->where('price_range', '>=', $request->price_min);
+            $query->where('price_min', '>=', $request->price_min);
         }
         if ($request->filled('price_max')) {
-            $query->where('price_range', '<=', $request->price_max);
+            $query->where('price_max', '<=', $request->price_max);
         }
 
         // 4. Tìm kiếm từ khóa (q)
@@ -44,23 +44,23 @@ class RestaurantController extends Controller
                 $subQuery->where('name', 'like', "%{$q}%")
                     // 2. Tìm trong địa chỉ
                     ->orWhere('address', 'like', "%{$q}%")
-                    // 3. MỚI: Tìm luôn trong Tên danh mục (Category)
+                    // 3. Tìm luôn trong Tên danh mục (Category)
                     ->orWhereHas('category', function ($catQuery) use ($q) {
                         $catQuery->where('name', 'like', "%{$q}%");
                     });
             });
         }
 
-        // 5. Sắp xếp (Sort)
+        // 5. Sắp xếp (Sort) - Đã sửa lại đúng cột price_min
         switch ($request->sort) {
             case 'rating':
-                $query->orderByDesc('reviews_avg_rating'); // Dùng cột tính toán từ withAvg
+                $query->orderByDesc('reviews_avg_rating'); 
                 break;
             case 'price_asc':
-                $query->orderBy('price_range', 'asc');
+                $query->orderBy('price_min', 'asc'); // Sắp xếp theo giá thấp nhất tăng dần
                 break;
             case 'price_desc':
-                $query->orderByDesc('price_range');
+                $query->orderByDesc('price_min'); // Sắp xếp theo giá thấp nhất giảm dần
                 break;
             case 'newest':
             default:
@@ -68,12 +68,11 @@ class RestaurantController extends Controller
                 break;
         }
 
-        // Phân trang 12 item và giữ lại toàn bộ query string (để chuyển trang không mất filter)
+        // Phân trang 12 item và giữ lại toàn bộ query string
         $restaurants = $query->paginate(12)->withQueryString();
 
         // Lấy dữ liệu cho bộ lọc ở Sidebar
         $categories = Category::all();
-        // Lấy danh sách các thành phố độc nhất đang có nhà hàng active
         $cities = Restaurant::active()->select('city')->distinct()->pluck('city')->filter();
 
         return view('restaurants.index', compact('restaurants', 'categories', 'cities'));
@@ -103,7 +102,7 @@ class RestaurantController extends Controller
             ->limit(4)
             ->get();
 
-        // DỰ PHÒNG: Nếu không có nhà hàng cùng danh mục, lấy ngẫu nhiên 4 nhà hàng khác
+        // DỰ PHÒNG
         if ($similarRestaurants->isEmpty()) {
             $similarRestaurants = Restaurant::active()
                 ->where('id', '!=', $restaurant->id)
@@ -120,21 +119,18 @@ class RestaurantController extends Controller
                 ->exists();
         }
 
-        // Truyền đúng tên biến sang View
         return view('restaurants.show', compact('restaurant', 'ratingDistribution', 'similarRestaurants', 'canReview'));
     }
+
     /**
-     * Tìm kiếm nhà hàng (Yêu cầu phải có từ khóa q)
+     * Tìm kiếm nhà hàng
      */
     public function search(Request $request)
     {
-        // Bắt buộc phải nhập từ khóa
         $request->validate([
             'q' => 'required|string|min:1'
         ]);
 
-        // Tận dụng lại logic của hàm index để tận dụng luôn filter & sort
-        // View index sẽ tự động nhận diện có request('q') để xử lý highlight
         return $this->index($request);
     }
 }

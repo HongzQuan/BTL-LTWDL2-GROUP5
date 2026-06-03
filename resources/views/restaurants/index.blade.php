@@ -3,7 +3,6 @@
 @section('content')
 <div class="container py-4">
 
-    <!-- THANH FILTER NGANG -->
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-body p-4">
             <form action="{{ route('restaurants.index') }}" method="GET" class="row g-3 align-items-end">
@@ -59,7 +58,6 @@
         </div>
     </div>
 
-    <!-- THANH SẮP XẾP & THÔNG TIN KẾT QUẢ -->
     <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-4 gap-3">
         <div>
             <p class="text-muted mb-0">Tìm thấy <strong class="text-dark">{{ $restaurants->total() }}</strong> nhà hàng
@@ -80,25 +78,33 @@
         </div>
     </div>
 
-    <!-- GRID HIỂN THỊ DANH SÁCH NHÀ HÀNG -->
     <div class="row row-cols-1 row-cols-md-3 g-4">
         @forelse($restaurants as $restaurant)
         <div class="col">
-            <div class="card h-100 border-0 shadow-sm hover-shadow transition-all position-relative">
+            <div class="card restaurant-card h-100 border-0 shadow-sm hover-shadow transition-all position-relative">
+
                 <div class="position-relative overflow-hidden rounded-top" style="aspect-ratio: 4/3;">
-                    <img src="{{ $restaurant->image ? asset($restaurant->image) : 'https://placehold.co/600x450?text=No+Image' }}"
+                    <img src="{{ $restaurant->image ? '/' . $restaurant->image : 'https://placehold.co/600x450?text=No+Image' }}"
                         class="w-100 h-100 object-fit-cover" alt="{{ $restaurant->name }}">
                     <span
                         class="position-absolute top-0 start-0 m-3 badge bg-dark bg-opacity-75 backdrop-blur py-2 px-3 fs-7">{{ $restaurant->category->name }}</span>
                 </div>
+
                 <div class="card-body d-flex flex-column p-4">
                     <h5 class="card-title fw-bold mb-2">
                         <a href="{{ url('/restaurants/' . $restaurant->id) }}"
                             class="text-decoration-none text-dark link-primary">{{ $restaurant->name }}</a>
                     </h5>
-                    <p class="card-text text-muted small mb-3 text-truncate">📍 {{ $restaurant->address }},
+
+                    <p class="card-text text-muted small mb-2 text-truncate">📍 {{ $restaurant->address }},
                         {{ $restaurant->district }}, {{ $restaurant->city }}
                     </p>
+
+                    <div class="fw-bold text-danger mb-3 mt-1">
+                        <i class="fas fa-tag me-1"></i>
+                        {{ number_format($restaurant->price_min, 0, ',', '.') }}đ - {{ number_format($restaurant->price_max, 0, ',', '.') }}đ
+                    </div>
+
                     <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top border-light">
                         <div>
                             <span class="text-warning fw-bold">★</span>
@@ -109,22 +115,12 @@
                             {{ \Carbon\Carbon::parse($restaurant->close_time)->format('H:i') }}
                         </div>
                     </div>
-                    <div class="mt-3">
-                        <a href="{{ route('restaurants.show', $restaurant->id) }}"
-                            class="btn btn-primary w-100 fw-bold">
-                            Xem chi tiết & Đặt bàn
-                        </a>
-                    </div>
                 </div>
-                <div class="position-absolute bottom-0 end-0 m-4 mb-5 pb-2">
-                    @php
-                    $priceBadge = '$';
-                    if($restaurant->price_range > 1000000) $priceBadge = '$$$';
-                    elseif($restaurant->price_range > 300000) $priceBadge = '$$';
-                    @endphp
-                    <span
-                        class="badge bg-light text-success border border-success border-opacity-25">{{ $priceBadge }}</span>
+
+                <div class="card-footer bg-white border-0 p-3 pt-0 text-center mt-auto">
+                    <a href="{{ route('restaurants.show', $restaurant->id) }}" class="btn btn-primary w-100 fw-bold">Xem chi tiết & Đặt bàn</a>
                 </div>
+
             </div>
         </div>
         @empty
@@ -137,31 +133,30 @@
         @endforelse
     </div>
 
-    <!-- PHÂN TRANG -->
     <div class="d-flex justify-content-center mt-5">
         {{ $restaurants->withQueryString()->links('pagination::bootstrap-5') }}
     </div>
 </div>
 <style>
-.restaurant-card {
-    border-radius: 20px;
-    overflow: hidden;
-    transition: all 0.3s ease;
-    background: #fff;
-}
+    .restaurant-card {
+        border-radius: 20px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        background: #fff;
+    }
 
-.restaurant-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.12) !important;
-}
+    .restaurant-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 14px 30px rgba(0, 0, 0, 0.12) !important;
+    }
 
-.restaurant-card img {
-    transition: transform 0.45s ease;
-}
+    .restaurant-card img {
+        transition: transform 0.45s ease;
+    }
 
-.restaurant-card:hover img {
-    transform: scale(1.08);
-}
+    .restaurant-card:hover img {
+        transform: scale(1.08);
+    }
 </style>
 
 @endsection

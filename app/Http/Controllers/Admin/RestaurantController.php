@@ -118,9 +118,17 @@ class RestaurantController extends Controller
 
         // Xử lý upload ảnh mới (nếu có chọn ảnh khác)
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('restaurants', 'public');
-            $restaurant->image = '/storage/' . $path;
-            // Ở cột CSDL của em nếu dùng 'image' thì sửa thành: $restaurant->image = $path;
+            // Xóa ảnh cũ
+            if ($restaurant->image && file_exists(public_path($restaurant->image))) {
+                unlink(public_path($restaurant->image));
+            }
+
+            $file = $request->file('image');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            
+            $file->move(public_path('uploads/restaurants'), $filename);
+            
+            $restaurant->image = 'uploads/restaurants/' . $filename;
         }
 
         $restaurant->save();

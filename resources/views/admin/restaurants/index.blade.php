@@ -38,7 +38,7 @@
                         <tr>
                             <td class="ps-4 text-center fw-semibold text-muted">#{{ $restaurant->id }}</td>
                             <td>
-                                <img src="{{ $restaurant->image ? asset($restaurant->image) : 'https://placehold.co/100x75?text=No+Image' }}"
+                                <img src="{{ $restaurant->image ? '/' . $restaurant->image : 'https://placehold.co/100x75?text=No+Image' }}"
                                     alt="{{ $restaurant->name }}" class="rounded shadow-sm object-fit-cover"
                                     style="width: 90px; height: 65px;">
                             </td>

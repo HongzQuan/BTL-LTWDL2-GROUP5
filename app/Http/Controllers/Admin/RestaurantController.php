@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Restaurant;
 use App\Models\Category;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class RestaurantController extends Controller
@@ -32,7 +31,7 @@ class RestaurantController extends Controller
             $query->where('status', $request->status);
         }
 
-        $restaurants = Restaurant::paginate(12);
+        $restaurants = $query->paginate(12);
 
         // Cung cấp 2 biến này sang cho View
         $cities = Restaurant::select('city')->distinct()->pluck('city')->filter();
@@ -58,7 +57,7 @@ class RestaurantController extends Controller
             'open_time'   => 'required|date_format:H:i',
             'close_time'  => 'required|date_format:H:i|after:open_time',
             'price_min'   => 'required|numeric|min:0',
-            'price_max'   => 'required|numeric|gte:price_min', // Lấy theo biến ở bài trước
+            'price_max'   => 'required|numeric|gte:price_min',
             'image'       => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
@@ -71,12 +70,13 @@ class RestaurantController extends Controller
             // Di chuyển file ảnh THẲNG vào thư mục public/uploads/restaurants/
             $file->move(public_path('uploads/restaurants'), $filename);
 
-            // Lưu đường dẫn này vào Database: "uploads/restaurants/tên_file.jpg"
-            $restaurant->image = 'uploads/restaurants/' . $filename;
+            // GÁN VÀO MẢNG $validated ĐỂ LƯU XUỐNG DB (Đã sửa lỗi null)
+            $validated['image'] = 'uploads/restaurants/' . $filename;
         }
 
         $validated['status'] = 1; // Mặc định active khi mới tạo
         $validated['slug'] = Str::slug($validated['name']);
+        
         Restaurant::create($validated);
 
         return redirect()->route('admin.restaurants.index')->with('success', 'Thêm nhà hàng thành công!');
@@ -85,8 +85,8 @@ class RestaurantController extends Controller
     // Hiển thị form Sửa nhà hàng
     public function edit($id)
     {
-        $restaurant = \App\Models\Restaurant::findOrFail($id);
-        $categories = \App\Models\Category::all();
+        $restaurant = Restaurant::findOrFail($id);
+        $categories = Category::all();
 
         // Trỏ đúng vào view của Admin
         return view('admin.restaurants.edit', compact('restaurant', 'categories'));
@@ -95,13 +95,14 @@ class RestaurantController extends Controller
     // Xử lý lưu dữ liệu khi cập nhật
     public function update(Request $request, $id)
     {
-        $restaurant = \App\Models\Restaurant::findOrFail($id);
+        $restaurant = Restaurant::findOrFail($id);
 
         $request->validate([
             'name' => 'required|string|max:255',
             'category_id' => 'required|exists:categories,id',
             'city' => 'required|string|max:100',
             'address' => 'required|string|max:255',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
         $restaurant->name = $request->name;
@@ -138,10 +139,9 @@ class RestaurantController extends Controller
 
     public function destroy($id)
     {
-        $restaurant = \App\Models\Restaurant::findOrFail($id);
+        $restaurant = Restaurant::findOrFail($id);
 
         // Kiểm tra booking pending/confirmed
-        // Giả sử quan hệ trong Model Restaurant là: public function bookings() { return $this->hasMany(Booking::class); }
         $hasActiveBookings = $restaurant->bookings()
             ->whereIn('status', ['pending', 'confirmed'])
             ->exists();
@@ -150,9 +150,9 @@ class RestaurantController extends Controller
             return redirect()->route('admin.restaurants.index')->with('error', 'Không thể vô hiệu hóa! Nhà hàng đang có đơn đặt bàn chờ xử lý hoặc đã xác nhận.');
         }
 
-        // Xóa ảnh cũ (nếu muốn giữ lại ảnh cho lịch sử thì bỏ đoạn này)
-        if ($restaurant->image) {
-            Storage::disk('public')->delete($restaurant->image);
+        // Xóa ảnh cũ chuẩn xác bằng unlink thay vì Storage (Đã sửa lỗi)
+        if ($restaurant->image && file_exists(public_path($restaurant->image))) {
+            unlink(public_path($restaurant->image));
         }
 
         // Soft disable
@@ -160,7 +160,9 @@ class RestaurantController extends Controller
             'status' => 0,
             'image'  => null
         ]);
+        
         $restaurant->delete();
+        
         return redirect()->route('admin.restaurants.index')->with('success', 'Đã xóa nhà hàng thành công!');
     }
 
@@ -175,7 +177,7 @@ class RestaurantController extends Controller
             ->take(4)
             ->get();
 
-        // DỰ PHÒNG: Nếu chuyên mục này ít quá không có nhà hàng nào giống, thì lấy ĐẠI 4 nhà hàng ngẫu nhiên trong hệ thống cho giao diện khỏi bị trống
+        // DỰ PHÒNG: Nếu chuyên mục này ít quá không có nhà hàng nào giống
         if ($similar->isEmpty()) {
             $similar = Restaurant::where('id', '!=', $restaurant->id)->inRandomOrder()->take(4)->get();
         }
